@@ -111,9 +111,8 @@ Backend
 > Se debe representar el modelo de datos y las relaciones entre las tablas.  
 > Puedes usar **Draw.io**, **Lucidchart**, **DB Diagram** u otra herramienta similar.
 
+<img width="931" height="361" alt="bd drawio" src="https://github.com/user-attachments/assets/6febdd9d-a4de-423a-bbee-adc9b06df912" />
 
-
-🖇️ *Agrega aquí tu diagrama en formato `.png` o `.drawio`.*
 
 ---
 
