@@ -111,9 +111,8 @@ Backend
 > Se debe representar el modelo de datos y las relaciones entre las tablas.  
 > Puedes usar **Draw.io**, **Lucidchart**, **DB Diagram** u otra herramienta similar.
 
+<img width="931" height="361" alt="bd drawio" src="https://github.com/user-attachments/assets/6febdd9d-a4de-423a-bbee-adc9b06df912" />
 
-
-🖇️ *Agrega aquí tu diagrama en formato `.png` o `.drawio`.*
 
 ---
 
@@ -126,6 +125,186 @@ Backend
 **Ejemplo:**
 ```json
 {
-  aqui el contrato
+  "name": "Pulganga API",
+  "version": "1.0.0",
+  "auth": {
+    "type": "JWT",
+    "header": "Authorization: Bearer <token>"
+  },
+  "endpoints": {
+    "auth": {
+      "POST /auth/register": {
+        "desc": "Registrar nuevo usuario",
+        "body": {
+          "username": "string",
+          "email": "string",
+          "password": "string",
+          "nombre": "string"
+        },
+        "response": {
+          "message": "Usuario registrado con éxito",
+          "usuario": {
+            "id": 1,
+            "username": "juan123",
+            "nombre": "Juan Pérez",
+            "email": "juan@example.com",
+            "rol": "user",
+            "fecha_registro": "2025-10-24T15:10:00Z"
+          },
+          "token": "<jwt_token>"
+        }
+      },
+      "POST /auth/login": {
+        "desc": "Iniciar sesión",
+        "body": {
+          "email": "string",
+          "password": "string"
+        },
+        "response": {
+          "message": "Login exitoso",
+          "token": "<jwt_token>",
+          "usuario": {
+            "id": 1,
+            "username": "juan123",
+            "rol": "user"
+          }
+        }
+      }
+    },
+    "usuarios": {
+      "GET /usuarios/me": {
+        "auth": true,
+        "desc": "Obtener perfil del usuario autenticado",
+        "response": {
+          "id": 1,
+          "username": "juan123",
+          "email": "juan@example.com",
+          "nombre": "Juan Pérez",
+          "rol": "user",
+          "fecha_registro": "2025-10-24T15:10:00Z"
+        }
+      },
+      "GET /usuarios/:id/publicaciones": {
+        "auth": true,
+        "desc": "Obtener publicaciones del usuario (autenticado o admin)",
+        "response": [
+          {
+            "id": 12,
+            "titulo": "Bicicleta de montaña",
+            "descripcion": "En excelente estado",
+            "precio": 120000,
+            "url_imagen": "https://img.com/bici.jpg",
+            "categoria": "Deportes",
+            "fecha_creacion": "2025-10-20T12:00:00Z",
+            "estado": true
+          }
+        ]
+      }
+    },
+    "categorias": {
+      "GET /categorias": {
+        "desc": "Listar todas las categorías",
+        "response": [
+          { "id": 1, "nombre": "Electrónica", "descripcion": "Celulares, TV, etc." },
+          { "id": 2, "nombre": "Hogar", "descripcion": "Muebles, decoración" }
+        ]
+      },
+      "POST /categorias": {
+        "auth": true,
+        "role": "admin",
+        "desc": "Crear nueva categoría",
+        "body": {
+          "nombre": "string",
+          "descripcion": "string"
+        },
+        "response": {
+          "id": 3,
+          "nombre": "Deportes",
+          "descripcion": "Artículos deportivos"
+        }
+      }
+    },
+    "publicaciones": {
+      "GET /publicaciones": {
+        "desc": "Listar todas las publicaciones (catálogo)",
+        "query": {
+          "categoria_id": "int (opcional)"
+        },
+        "response": [
+          {
+            "id": 5,
+            "titulo": "Bicicleta de montaña",
+            "descripcion": "En excelente estado",
+            "precio": 120000,
+            "url_imagen": "https://img.com/bici.jpg",
+            "categoria": { "id": 2, "nombre": "Deportes" },
+            "usuario": { "id": 1, "username": "juan123" },
+            "fecha_creacion": "2025-10-20T12:00:00Z",
+            "estado": true
+          }
+        ]
+      },
+      "GET /publicaciones/:id": {
+        "desc": "Obtener detalles de una publicación",
+        "response": {
+          "id": 5,
+          "titulo": "Bicicleta de montaña",
+          "descripcion": "En excelente estado",
+          "precio": 120000,
+          "url_imagen": "https://img.com/bici.jpg",
+          "categoria": { "id": 2, "nombre": "Deportes" },
+          "usuario": { "id": 1, "username": "juan123" },
+          "fecha_creacion": "2025-10-20T12:00:00Z",
+          "estado": true
+        }
+      },
+      "POST /publicaciones": {
+        "auth": true,
+        "desc": "Crear nueva publicación",
+        "body": {
+          "titulo": "string",
+          "descripcion": "string",
+          "precio": "int",
+          "url_imagen": "string",
+          "categoria_id": "int"
+        },
+        "response": {
+          "id": 10,
+          "message": "Publicación creada correctamente"
+        }
+      },
+      "PUT /publicaciones/:id": {
+        "auth": true,
+        "desc": "Actualizar publicación (solo dueño o admin)",
+        "body": {
+          "titulo": "string (opcional)",
+          "descripcion": "string (opcional)",
+          "precio": "int (opcional)",
+          "estado": "boolean (opcional)"
+        },
+        "response": {
+          "message": "Publicación actualizada correctamente"
+        }
+      },
+      "DELETE /publicaciones/:id": {
+        "auth": true,
+        "desc": "Eliminar publicación (solo dueño o admin)",
+        "response": {
+          "message": "Publicación eliminada correctamente"
+        }
+      }
+    }
+  },
+  "errors": {
+    "400": "Datos inválidos o faltantes",
+    "401": "Token JWT inválido o ausente",
+    "403": "Permisos insuficientes",
+    "404": "Recurso no encontrado",
+    "500": "Error interno del servidor"
+  },
+  "roles": {
+    "user": ["ver", "crear", "editar propias publicaciones"],
+    "admin": ["todo acceso"]
+  }
 }
 
