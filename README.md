@@ -48,15 +48,18 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 **Públicas:**
 - Página principal  
 - Registro  
-- Inicio de sesión  
+- Inicio de sesión
+- Galeria
+- Detalle publicación
+- Carro de compras
 
 **Privadas:**
 - Mi perfil  
-- Crear publicación  
-- Galería  
-- Detalle de publicación  
+- Crear publicación 
+- Mis publicaciones
+  
+![vistas](https://github.com/user-attachments/assets/51382e7a-ca1e-4041-8fbf-dfe9ad4e8f23)
 
-📄 *Incluye un diagrama o tabla que represente la navegación.*
 
 ---
 
