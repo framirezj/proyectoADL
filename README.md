@@ -37,7 +37,6 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 - 🖼️ Galería de publicaciones  
 - 🔍 Detalle de una publicación  
 
-📂 *Carpeta sugerida:* `/ui-design`  
 🖇️ *Agrega aquí tus imágenes o enlaces a los bocetos.*
 
 ---
@@ -57,7 +56,6 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 - Galería  
 - Detalle de publicación  
 
-📂 *Carpeta sugerida:* `/navigation`  
 📄 *Incluye un diagrama o tabla que represente la navegación.*
 
 ---
@@ -76,7 +74,6 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 | DB | PostgreSQL | Base de datos relacional |
 | Auth | JWT | Autenticación segura |
 
-📂 *Archivo sugerido:* `/dependencies/dependencias.md`
 
 ---
 
@@ -85,7 +82,7 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 > Se debe representar el modelo de datos y las relaciones entre las tablas.  
 > Puedes usar **Draw.io**, **Lucidchart**, **DB Diagram** u otra herramienta similar.
 
-📂 *Carpeta sugerida:* `/database-design`
+
 
 **Ejemplo de tablas mínimas:**
 - `usuarios`
@@ -102,7 +99,7 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 
 > Documento que define los **endpoints**, **métodos HTTP**, **rutas**, **parámetros** y **estructuras de datos** esperadas.
 
-📂 *Carpeta sugerida:* `/api-contract`
+
 
 **Ejemplo:**
 ```json
