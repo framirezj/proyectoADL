@@ -92,14 +92,13 @@ Backend
     "dotenv",
     "express",
     "jsonwebtoken",
-    "nanoid",
     "pg",
     "pg-format",
     "morgan",
-    "jest"
   ],
   "desarrollo": [
-    "nodemon"
+    "nodemon",
+    "jest"
   ]
 }
 ```
