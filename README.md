@@ -64,7 +64,23 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 
 > Lista de librerías, frameworks o herramientas que se utilizarán.
 
-*Backend
+Frontend
+```json
+{
+  "dependencies": [
+    "vite",
+    "react",
+    "react-router-dom",
+    "axios",
+    "lucide-react",
+    "react-hot-toast",
+    "tailwindcss",
+    "daisyui"
+  ]
+}
+```
+
+Backend
 ```json
 {
   "produccion": [
@@ -76,7 +92,8 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
     "nanoid",
     "pg",
     "pg-format",
-    "morgan"
+    "morgan",
+    "jest"
   ],
   "desarrollo": [
     "nodemon"
