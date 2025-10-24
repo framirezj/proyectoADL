@@ -64,15 +64,25 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 
 > Lista de librerías, frameworks o herramientas que se utilizarán.
 
-**Ejemplo:**
-| Tipo | Dependencia | Descripción |
-|------|--------------|-------------|
-| Frontend | React | Framework principal |
-| CSS | Tailwind CSS | Estilos y componentes |
-| Routing | React Router DOM | Navegación entre vistas |
-| Backend | Express | Framework para la API |
-| DB | PostgreSQL | Base de datos relacional |
-| Auth | JWT | Autenticación segura |
+*Backend
+```json
+{
+  "produccion": [
+    "bcryptjs",
+    "cors",
+    "dotenv",
+    "express",
+    "jsonwebtoken",
+    "nanoid",
+    "pg",
+    "pg-format",
+    "morgan"
+  ],
+  "desarrollo": [
+    "nodemon"
+  ]
+}
+```
 
 
 ---
