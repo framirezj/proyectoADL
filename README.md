@@ -114,13 +114,6 @@ Backend
 
 
 
-**Ejemplo de tablas mínimas:**
-- `usuarios`
-- `publicaciones`
-- `categorias`
-- `comentarios`
-- `favoritos`
-
 🖇️ *Agrega aquí tu diagrama en formato `.png` o `.drawio`.*
 
 ---
@@ -134,27 +127,6 @@ Backend
 **Ejemplo:**
 ```json
 {
-  "api": "Marketplace API (Versión 1.0)",
-  "base_url": "/api",
-  "auth": {
-    "type": "JWT",
-    "header": "Authorization: Bearer <token>"
-  },
-  "routes": [
-    {
-      "name": "Registro de usuario",
-      "method": "POST",
-      "path": "/auth/register",
-      "protected": false,
-      "description": "Registrar un nuevo usuario."
-    },
-    {
-      "name": "Inicio de sesión",
-      "method": "POST",
-      "path": "/auth/login",
-      "protected": false,
-      "description": "Autenticar usuario y devolver token."
-    }
-  ]
+  aqui el contrato
 }
 
