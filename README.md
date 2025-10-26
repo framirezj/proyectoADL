@@ -37,7 +37,14 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 - 🖼️ Galería de publicaciones  
 - 🔍 Detalle de una publicación  
 
-🖇️ *Agrega aquí tus imágenes o enlaces a los bocetos.*
+<img width="975" height="487" alt="image" src="https://github.com/user-attachments/assets/cc7c1303-ec39-4052-a7b9-6ab54de658be" />
+<img width="975" height="481" alt="image" src="https://github.com/user-attachments/assets/7b4ef2c8-8c26-4d65-9595-dcc140f22b16" />
+<img width="975" height="698" alt="image" src="https://github.com/user-attachments/assets/f3b0d510-2ba3-4b21-af43-13334a6e4344" />
+<img width="861" height="517" alt="image" src="https://github.com/user-attachments/assets/7b04adec-2f9e-4428-aed2-ac51f5fac95f" />
+<img width="975" height="437" alt="image" src="https://github.com/user-attachments/assets/f09050fa-880c-4ec6-be3a-2187f6a04012" />
+<img width="975" height="835" alt="image" src="https://github.com/user-attachments/assets/61a7a277-1459-4135-a6b6-46dad6af6f4f" />
+<img width="928" height="1011" alt="image" src="https://github.com/user-attachments/assets/82e2db87-1f41-4ba7-93f8-2ffda536a619" />
+<img width="833" height="1119" alt="image" src="https://github.com/user-attachments/assets/8976b7bd-dc81-4dad-af50-04146bed85ee" />
 
 ---
 
