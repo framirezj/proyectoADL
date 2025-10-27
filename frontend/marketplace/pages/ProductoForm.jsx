@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function ProductoForm() {
   return (
-    <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10">
+    <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10 max-w-6xl mx-auto">
       <h3 className="font-bold text-2xl">Publicar Producto</h3>
       <p className="text-xs text-gray-500 mt-3">Completa la información de tu producto</p>
 
