@@ -10,11 +10,11 @@ export default function Header() {
         <a className="btn btn-ghost text-xl">Pulga Vibe</a>
       </div>
       <div className="navbar-end flex gap-4">
-        <a className="btn">Button</a>
-        <a className="btn">Button</a>
-        <a className="btn">Button</a>
-        <a className="btn">Button</a>
-        <a className="btn">Button</a>
+        <a className="btn">Inicio</a>
+        <a className="btn">Productos</a>
+        <a className="btn">Mis Publicaciones</a>
+        <a className="btn">Mi Perfil</a>
+        <a className="btn">Inicio Sesión</a>
       </div>
     </header>
   );
