@@ -1,3 +1,6 @@
+import { Link } from 'react-router-dom'
+
+
 export default function LoginForm() {
   return (
     <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10">
@@ -14,7 +17,9 @@ export default function LoginForm() {
         <button className="btn btn-primary mt-4">Iniciar Sesión</button>
       </fieldset>
       
-      <p className="text-sm text-gray-500 mt-3">¿No tienes una cuenta? Registrate aqui</p>
+      <p className="text-sm text-gray-500 mt-3">¿No tienes una cuenta? <Link to="/register" className="text-primary hover:underline ml-1">
+          Registrate aqui
+        </Link></p>
     </div>
   );
 }
