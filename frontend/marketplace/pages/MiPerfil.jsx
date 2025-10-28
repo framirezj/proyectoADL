@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../src/context/AuthContext';
+import { User } from 'lucide-react';
 
 export default function MiPerfil() {
+
+  const { user } = useAuth()
+
   return (
-    <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10 max-w-md mx-auto">
+    <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10 max-w-md mx-auto mt-8">
       <h3 className="font-bold text-2xl">Mi Perfil</h3>
       <p className="text-xs text-gray-500 mt-3">
         Gestiona tu información personal
@@ -12,7 +17,7 @@ export default function MiPerfil() {
         {/* Avatar de Usuario */}
         <div className="avatar mb-6">
           <div className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center text-2xl font-bold">
-            JP
+            <User size={48}/>
           </div>
         </div>
 
@@ -21,7 +26,7 @@ export default function MiPerfil() {
           <div className="flex flex-col">
             <label className="label font-bold text-sm">Nombre de Usuario</label>
             <div className="p-3 bg-base-100 rounded-lg border border-base-300">
-              <span className="text-base">Juan Pérez</span>
+              <span className="text-base">{user.nombre}</span>
             </div>
           </div>
 
@@ -30,16 +35,11 @@ export default function MiPerfil() {
               Correo Electrónico
             </label>
             <div className="p-3 bg-base-100 rounded-lg border border-base-300">
-              <span className="text-base">juan.perez@email.com</span>
+              <span className="text-base">{user.email}</span>
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <label className="label font-bold text-sm">Miembro Desde</label>
-            <div className="p-3 bg-base-100 rounded-lg border border-base-300">
-              <span className="text-base">15 de Enero, 2024</span>
-            </div>
-          </div>
+          
         </div>
 
         {/* Botones de Acción */}
@@ -61,13 +61,13 @@ export default function MiPerfil() {
             </svg>
             <Link
               to="/mispublicaciones"
-              className="text-primary hover:underline ml-1"
+              className="text-accent ml-1"
             >
               Mis Publicaciones
             </Link>
           </button>
 
-          <button className="btn btn-outline btn-primary w-full gap-2">
+          <button className="btn btn-outline btn-primary text-accent w-full gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -82,12 +82,15 @@ export default function MiPerfil() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            Crear Publicación
+            <Link
+              to="/nuevo"
+              className="text-accent ml-1"
+            >
+              Crear Publicación
+            </Link>
           </button>
 
-          <button className="btn btn-ghost btn-sm mt-2 text-gray-500">
-            Editar Perfil
-          </button>
+          
         </div>
       </div>
     </div>
