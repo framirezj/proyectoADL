@@ -25,7 +25,7 @@ export default function LoginForm() {
     */
 
     try {
-      const response = await api.post("http://localhost:3000/api/auth/login", {
+      const response = await api.post("/auth/login", {
         usernameOrEmail: email,
         password: password,
       });
