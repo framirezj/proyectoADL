@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../src/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import api from "../../src/api/axiosConfig";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
