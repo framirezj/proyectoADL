@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../src/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { House, List, LogIn, LogOut   } from "lucide-react";
 
 export default function Header() {
   const { logout, isAuthenticated } = useAuth();
@@ -23,15 +24,17 @@ export default function Header() {
       </div>
       <div className="navbar-end flex gap-4">
         <Link to="/" className="btn">
+          <House />
           Inicio
         </Link>
         <Link to="#" className="btn">
+          <List />
           Productos
         </Link>
 
         {!isAuthenticated ? (
           <Link to="/login" className="btn">
-            Inicio Sesión
+             <LogIn />Inicio Sesión
           </Link>
         ) : (
           <>
@@ -42,7 +45,7 @@ export default function Header() {
               Mi Perfil
             </Link>
             <button onClick={handleLogout} className="btn">
-              Cerrar Sesión
+              <LogOut />Cerrar Sesión
             </button>
           </>
         )}
