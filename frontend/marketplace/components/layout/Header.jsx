@@ -1,7 +1,19 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../src/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Header() {
+
+  const { logout, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
   return (
     <header className="navbar bg-base-100 flex justify-evenly shadow-sm">
       <div className="flex items-center">
@@ -17,7 +29,12 @@ export default function Header() {
         <Link to="#" className='btn'>Productos</Link>
         <Link to="/mispublicaciones" className='btn'>Mis Publicaciones</Link>
         <Link to="/miperfil" className='btn'>Mi Perfil</Link>
+
+        {!isAuthenticated ? 
         <Link to="/login" className='btn'>Inicio Sesión</Link>
+        :
+        <button onClick={handleLogout} className='btn'>Cerrar Sesión</button>  
+      }
       </div>
     </header>
   );
