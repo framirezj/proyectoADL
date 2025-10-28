@@ -95,10 +95,7 @@ export default function ProductoForm() {
         submitData.append('imagen', formData.imagen);
       }
 
-
-      /* 
-      AUN NO LISTO EN EL BACKEND
-      const response = await api.post('/productos', submitData, {
+      const response = await api.post('/producto/nuevo', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -107,7 +104,7 @@ export default function ProductoForm() {
       if (response.status === 201) {
         alert('Producto publicado exitosamente!');
         navigate('/mispublicaciones'); // o a donde quieras redirigir
-      } */
+      } 
 
       console.log(formData)
     } catch (error) {
