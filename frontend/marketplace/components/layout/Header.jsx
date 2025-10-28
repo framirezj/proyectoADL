@@ -1,3 +1,6 @@
+import { Link } from 'react-router-dom'
+
+
 export default function Header() {
   return (
     <header className="navbar bg-base-100 flex justify-evenly shadow-sm">
@@ -10,11 +13,11 @@ export default function Header() {
         <a className="btn btn-ghost text-xl">Pulga Vibe</a>
       </div>
       <div className="navbar-end flex gap-4">
-        <a className="btn">Inicio</a>
-        <a className="btn">Productos</a>
-        <a className="btn">Mis Publicaciones</a>
-        <a className="btn">Mi Perfil</a>
-        <a className="btn">Inicio Sesión</a>
+        <Link to="/" className='btn'>Inicio</Link>
+        <Link to="#" className='btn'>Productos</Link>
+        <Link to="/mispublicaciones" className='btn'>Mis Publicaciones</Link>
+        <Link to="/miperfil" className='btn'>Mi Perfil</Link>
+        <Link to="/login" className='btn'>Inicio Sesión</Link>
       </div>
     </header>
   );
