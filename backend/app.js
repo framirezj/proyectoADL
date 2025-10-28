@@ -8,6 +8,7 @@ import morgan from "morgan";
 import pool from "./config/db.js";
 import usuariosRouter from "./routes/usuarios.js";
 import authRouter from "./routes/auth.js";
+import productoRouter from "./routes/producto.js"
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get("/", (req, res) => {
 // Routers
 app.use("/api/auth", authRouter);
 app.use("/api", usuariosRouter);
+app.use("/api/producto", productoRouter)
 
 // 404
 app.use((req, res) => {
