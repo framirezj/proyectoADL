@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../src/context/AuthContext";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     /* {
     "usernameOrEmail": "framirezj2",
@@ -20,36 +20,26 @@ export default function LoginForm() {
     } */
 
     /* 
-    /api/auth/login
+    http://localhost:3000/api/auth/login
     */
 
     try {
-      // Aquí va tu llamada a la API de login
-      const response = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ usernameOrEmail: email, password }),
-      })
+      const response = await api.post("http://localhost:3000/api/auth/login", {
+        usernameOrEmail: email,
+        password: password,
+      });
 
-      const data = await response.json()
-
-      if (response.ok) {
-        // Usar el context para hacer login
-        await login(data.user, data.token)
-        // Redirigir al dashboard o página principal
-        navigate('/')
-      } else {
-        alert(data.message || 'Error en el login')
-      }
+      const data = response.data;
+      await login(data.user, data.token);
+      navigate("/dashboard");
     } catch (error) {
-      console.error('Error:', error)
-      alert('Error de conexión')
+      // El manejo de errores es más simple con la instancia configurada
+      const errorMessage = error.response?.data?.message || "Error en el login";
+      alert(errorMessage);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10">
@@ -58,35 +48,35 @@ export default function LoginForm() {
         Ingresa a tu cuenta del marketplace
       </p>
       <form onSubmit={handleSubmit}>
-      <fieldset className="fieldset mt-5 mb-5 w-full">
-        <label className="label font-bold ">Correo Electrónico</label>
-        <input
-          type="email"
-          className="input mb-3"
-          placeholder="tu@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <fieldset className="fieldset mt-5 mb-5 w-full">
+          <label className="label font-bold ">Correo Electrónico</label>
+          <input
+            type="email"
+            className="input mb-3"
+            placeholder="tu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-        <label className="label font-bold">Contraseña</label>
-        <input
-          type="password"
-          className="input mb-3"
-          placeholder="******"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <label className="label font-bold">Contraseña</label>
+          <input
+            type="password"
+            className="input mb-3"
+            placeholder="******"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <button
-          className="btn btn-primary mt-4"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-        </button>
-      </fieldset>
+          <button
+            className="btn btn-primary mt-4"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+          </button>
+        </fieldset>
       </form>
 
       <p className="text-sm text-gray-500 mt-3">
