@@ -1,29 +1,7 @@
-import React from "react";
+import { useCart } from "../src/context/CartContext";
 
 const ShoppingCart = () => {
-  // Datos de ejemplo para la maquetación
-  const cartItems = [
-    {
-      id: 1,
-      name: "Zapatos Deportivos Nike",
-      price: 120.0,
-      quantity: 1,
-      image:
-        "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp",
-      size: "42",
-      color: "Negro",
-    },
-    {
-      id: 2,
-      name: "Zapatos Deportivos Nike",
-      price: 120.0,
-      quantity: 1,
-      image:
-        "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp",
-      size: "42",
-      color: "Negro",
-    },
-  ];
+  const {  cartItems,  removeFromCart, clearCart } = useCart();
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -54,7 +32,7 @@ const ShoppingCart = () => {
                 <h2 className="text-xl font-semibold">
                   Productos en el carrito ({cartItems.length})
                 </h2>
-                <button className="btn btn-ghost btn-sm text-error">
+                <button className="btn btn-ghost btn-sm text-error" onClick={() => clearCart()}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 mr-1"
@@ -91,16 +69,12 @@ const ShoppingCart = () => {
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <h3 className="card-title text-lg">{item.name}</h3>
-                          <div className="flex gap-4 mt-2 text-sm text-gray-600">
-                            <span>Talla: {item.size}</span>
-                            <span>Color: {item.color}</span>
-                          </div>
                           <p className="text-lg font-bold text-primary mt-2">
                             ${item.price.toFixed(2)}
                           </p>
                         </div>
 
-                        <button className="btn btn-ghost btn-sm btn-circle text-error">
+                        <button className="btn btn-ghost btn-sm btn-circle text-error" onClick={() => removeFromCart(item.id)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4"

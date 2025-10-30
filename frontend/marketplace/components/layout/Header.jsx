@@ -3,11 +3,13 @@ import { useAuth } from "../../src/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { House, List, LogIn, LogOut, ShoppingCart, User, Menu } from "lucide-react";
 import { useState } from "react";
+import { useCart } from "../../src/context/CartContext";
 
 export default function Header() {
   const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const {getItemCount } = useCart()
 
   const handleLogout = () => {
     logout();
@@ -72,7 +74,7 @@ export default function Header() {
               >
                 <ShoppingCart size={22} />
                 <span className="absolute -top-1 -right-1 bg-primary text-primary-content text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  0
+                  {getItemCount()}
                 </span>
               </Link>
 
