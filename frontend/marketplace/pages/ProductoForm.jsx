@@ -103,7 +103,7 @@ export default function ProductoForm() {
 
       if (response.status === 201) {
         alert('Producto publicado exitosamente!');
-        navigate('/mispublicaciones'); // o a donde quieras redirigir
+        navigate('/mispublicaciones');
       } 
 
       console.log(formData)
@@ -123,144 +123,225 @@ export default function ProductoForm() {
   };
 
   return (
-    <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10 max-w-6xl mx-auto">
-      <h3 className="font-bold text-2xl">Publicar Producto</h3>
-      <p className="text-xs text-gray-500 mt-3">Completa la información de tu producto</p>
-
-      {error && (
-        <div className="alert alert-error mt-4 w-full">
-          <span>{error}</span>
+    <div className="min-h-screen bg-base-200 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Header Mejorado */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-base-content mb-3">Publicar Nuevo Producto</h1>
+          <p className="text-lg text-base-content/70">Completa la información de tu producto para comenzar a vender</p>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit} className="w-full">
-        <fieldset className="fieldset mt-5 mb-5 w-full" disabled={loading}>
-          {/* Título del Producto */}
-          <label className="label font-bold">Título del Producto</label>
-          <input 
-            type="text" 
-            name="titulo"
-            className="input mb-3 w-full" 
-            placeholder="Ej: iPhone 13 Pro Max 256GB" 
-            value={formData.titulo}
-            onChange={handleChange}
-            required
-          />
-
-          {/* Categoría */}
-          <label className="label font-bold">Categoría</label>
-          <select 
-            name="categoria"
-            className="select mb-3 w-full" 
-            value={formData.categoria}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona una categoría</option>
-            <option value="electronica">Electrónica</option>
-            <option value="hogar">Hogar</option>
-            <option value="ropa">Ropa</option>
-            <option value="deportes">Deportes</option>
-            <option value="libros">Libros</option>
-            <option value="otros">Otros</option>
-          </select>
-
-          {/* Precio */}
-          <label className="label font-bold">Precio</label>
-          <div className="relative mb-3">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-            <input 
-              type="number" 
-              name="precio"
-              className="input pl-8 w-full" 
-              placeholder="0.00" 
-              step="0.01"
-              min="0"
-              value={formData.precio}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* Descripción */}
-          <label className="label font-bold">Descripción</label>
-          <textarea 
-            name="descripcion"
-            className="textarea mb-3 w-full h-24" 
-            placeholder="Describe tu producto en detalle..."
-            value={formData.descripcion}
-            onChange={handleChange}
-            required
-          ></textarea>
-
-          {/* Imagen del Producto */}
-          <label className="label font-bold">Imagen del Producto</label>
-          <input 
-            type="file" 
-            name="imagen"
-            className="file-input mb-3 w-full" 
-            accept="image/*"
-            onChange={handleChange}
-          />
-          <p className="text-xs text-gray-500 mb-3">Formatos: JPG, PNG, GIF (Máx. 5MB)</p>
-          
-          {/* Preview de la imagen */}
-          {previewImage && (
-            <div className="mb-3">
-              <p className="label font-bold">Vista previa:</p>
-              <img 
-                src={previewImage} 
-                alt="Preview" 
-                className="mt-2 max-w-xs max-h-48 object-cover rounded-lg border"
-              />
+        {/* Card del Formulario */}
+        <div className="bg-base-100 rounded-3xl shadow-xl p-8 border border-base-300">
+          {error && (
+            <div className="alert alert-error mb-6 animate-fade-in">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{error}</span>
             </div>
           )}
 
-          {/* Condición */}
-          <label className="label font-bold">Condición</label>
-          <div className="flex gap-4 mb-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input 
-                type="radio" 
-                name="condicion" 
-                className="radio" 
-                value="nuevo" 
-                checked={formData.condicion === 'nuevo'}
-                onChange={handleChange}
-                required
-              />
-              <span>Nuevo</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input 
-                type="radio" 
-                name="condicion" 
-                className="radio" 
-                value="usado" 
-                checked={formData.condicion === 'usado'}
-                onChange={handleChange}
-              />
-              <span>Usado</span>
-            </label>
-          </div>
+          <form onSubmit={handleSubmit}>
+            <fieldset className="space-y-6" disabled={loading}>
+              
+              {/* Título del Producto */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-lg font-semibold">Título del Producto</span>
+                </label>
+                <input 
+                  type="text" 
+                  name="titulo"
+                  className="input input-bordered input-lg w-full focus:input-primary" 
+                  placeholder="Ej: iPhone 13 Pro Max 256GB en perfecto estado" 
+                  value={formData.titulo}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          {/* Botón Publicar Producto */}
-          <button 
-            type="submit" 
-            className="btn btn-primary mt-4 w-full"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="loading loading-spinner"></span>
-                Publicando...
-              </>
-            ) : (
-              'Publicar Producto'
-            )}
-          </button>
-        </fieldset>
-      </form>
+              {/* Categoría y Precio en fila */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Categoría */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-lg font-semibold">Categoría</span>
+                  </label>
+                  <select 
+                    name="categoria"
+                    className="select select-bordered select-lg w-full focus:select-primary" 
+                    value={formData.categoria}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Selecciona una categoría</option>
+                    <option value="electronica">Electrónica</option>
+                    <option value="hogar">Hogar</option>
+                    <option value="ropa">Ropa</option>
+                    <option value="deportes">Deportes</option>
+                    <option value="libros">Libros</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+
+                {/* Precio */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-lg font-semibold">Precio</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-primary font-bold">$</span>
+                    <input 
+                      type="number" 
+                      name="precio"
+                      className="input input-bordered input-lg w-full pl-12 focus:input-primary" 
+                      placeholder="0.00" 
+                      step="0.01"
+                      min="0"
+                      value={formData.precio}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Descripción */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-lg font-semibold">Descripción</span>
+                </label>
+                <textarea 
+                  name="descripcion"
+                  className="textarea textarea-bordered w-full h-32 textarea-lg focus:textarea-primary" 
+                  placeholder="Describe tu producto en detalle: características, estado, accesorios incluidos, etc."
+                  value={formData.descripcion}
+                  onChange={handleChange}
+                  required
+                ></textarea>
+              </div>
+
+              {/* Imagen del Producto */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-lg font-semibold">Imagen del Producto</span>
+                </label>
+                <div className="border-2 border-dashed border-base-300 rounded-2xl p-6 text-center hover:border-primary transition-colors">
+                  <input 
+                    type="file" 
+                    name="imagen"
+                    className="file-input file-input-bordered file-input-primary w-full max-w-xs mx-auto mb-4" 
+                    accept="image/*"
+                    onChange={handleChange}
+                  />
+                  <p className="text-sm text-base-content/60">
+                    Formatos: JPG, PNG, GIF • Máximo 5MB
+                  </p>
+                  
+                  {/* Preview de la imagen */}
+                  {previewImage && (
+                    <div className="mt-4">
+                      <p className="text-sm font-semibold mb-2">Vista previa:</p>
+                      <div className="flex justify-center">
+                        <img 
+                          src={previewImage} 
+                          alt="Preview" 
+                          className="max-w-48 max-h-48 object-cover rounded-xl shadow-lg border-2 border-primary"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Condición */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-lg font-semibold">Condición del Producto</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                    formData.condicion === 'nuevo' 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-base-300 hover:border-primary/50'
+                  }`}>
+                    <input 
+                      type="radio" 
+                      name="condicion" 
+                      className="radio radio-primary mr-3" 
+                      value="nuevo" 
+                      checked={formData.condicion === 'nuevo'}
+                      onChange={handleChange}
+                      required
+                    />
+                    <div>
+                      <span className="font-semibold text-lg">Nuevo</span>
+                      <p className="text-sm text-base-content/60">Producto sin uso, en empaque original</p>
+                    </div>
+                  </label>
+                  
+                  <label className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                    formData.condicion === 'usado' 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-base-300 hover:border-primary/50'
+                  }`}>
+                    <input 
+                      type="radio" 
+                      name="condicion" 
+                      className="radio radio-primary mr-3" 
+                      value="usado" 
+                      checked={formData.condicion === 'usado'}
+                      onChange={handleChange}
+                    />
+                    <div>
+                      <span className="font-semibold text-lg">Usado</span>
+                      <p className="text-sm text-base-content/60">Producto en buen estado, con señales de uso</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Botones de Acción */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                <button 
+                  type="button" 
+                  onClick={() => navigate(-1)}
+                  className="btn btn-outline btn-lg flex-1 gap-2"
+                  disabled={loading}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Cancelar
+                </button>
+                
+                <button 
+                  type="submit" 
+                  className="btn btn-primary btn-lg flex-1 gap-2 shadow-lg"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="loading loading-spinner"></span>
+                      Publicando...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Publicar Producto
+                    </>
+                  )}
+                </button>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+
+        
+      </div>
     </div>
   );
 }
