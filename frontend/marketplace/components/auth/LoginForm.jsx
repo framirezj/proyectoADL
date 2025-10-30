@@ -1,14 +1,12 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../../src/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../../src/api/axiosConfig";
 
-export default function LoginForm() {
+export default function LoginForm({login}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

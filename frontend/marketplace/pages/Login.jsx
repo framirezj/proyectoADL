@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 export default function Login() {
 
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, login } = useAuth()
   const navigate = useNavigate()
 
 
@@ -17,7 +17,7 @@ export default function Login() {
 
   return (
     <div className="flex justify-center pt-12">
-      <LoginForm />
+      <LoginForm login={login}/>
     </div>
   );
 }
