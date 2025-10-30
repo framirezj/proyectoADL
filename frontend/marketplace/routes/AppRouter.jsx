@@ -7,6 +7,8 @@ import Register from "../pages/Register";
 import MiPerfil from "../pages/MiPerfil";
 import MisPublicaciones from "../pages/MisPublicaciones";
 import ProductoForm from "../pages/ProductoForm";
+import ShoppingCart from "../pages/Carrito";
+import ProductDetail from "../pages/DetalleProducto";
 
 export default function AppRouter() {
   return (
@@ -17,6 +19,8 @@ export default function AppRouter() {
         <Route path="/miperfil" element={<MiPerfil />} />
         <Route path="/mispublicaciones" element={<MisPublicaciones />} />
         <Route path="/nuevo" element={<ProductoForm />} />
+        <Route path="/carrito" element={<ShoppingCart />} />
+        <Route path="/detalle" element={<ProductDetail />} />
         <Route path="/" element={<Home />} />
       </Route>
     </Routes>
