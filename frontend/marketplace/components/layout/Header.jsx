@@ -39,9 +39,6 @@ export default function Header() {
           </Link>
         ) : (
           <>
-            <Link to="/mispublicaciones" className="btn">
-              Mis Publicaciones
-            </Link>
             <Link to="/miperfil" className="btn">
               Mi Perfil
             </Link>
