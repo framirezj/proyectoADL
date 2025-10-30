@@ -11,6 +11,7 @@ import ShoppingCart from "../pages/Carrito";
 import ProductDetail from "../pages/DetalleProducto";
 import { useAuth } from "../src/context/AuthContext";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import ProductGallery from "../pages/Galeria";
 
 // Componente de loading global
 const GlobalLoading = () => (
@@ -37,6 +38,7 @@ export default function AppRouter() {
       <Route path="/login" element={<Login />} />
       <Route path="/detalle" element={<ProductDetail />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/catalogo" element={<ProductGallery />} />
       
       {/* Rutas protegidas */}
       <Route 

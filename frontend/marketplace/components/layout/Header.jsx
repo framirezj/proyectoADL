@@ -27,7 +27,7 @@ export default function Header() {
           <House />
           Inicio
         </Link>
-        <Link to="#" className="btn">
+        <Link to="/catalogo" className="btn">
           <List />
           Productos
         </Link>
