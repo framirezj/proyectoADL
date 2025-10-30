@@ -1,145 +1,185 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 export default function MisPublicaciones() {
-  return (
-    <div className="flex flex-col bg-base-200 border-base-300 border p-8 max-w-6xl mx-auto">
-      <h3 className="font-bold text-2xl mb-6">Mis Publicaciones</h3>
+  // Datos de ejemplo para las publicaciones
+  const publicaciones = [
+    {
+      id: 1,
+      titulo: "iPhone 13 Pro",
+      categoria: "Telefonía",
+      condicion: "nuevo",
+      precio: 899,
+      imagen: "📱",
+      colorGradiente: "from-blue-400 to-blue-600",
+      vistas: 124,
+      favoritos: 8,
+      fecha: "2024-01-15",
+    },
+    {
+      id: 2,
+      titulo: "MacBook Air M2",
+      categoria: "Computación",
+      condicion: "usado",
+      precio: 1199,
+      imagen: "💻",
+      colorGradiente: "from-green-400 to-green-600",
+      vistas: 89,
+      favoritos: 12,
+      fecha: "2024-01-10",
+    },
+  ];
 
-      <div className="overflow-x-auto">
-        <table className="table table-zebra w-full">
-          {/* Encabezados de la tabla */}
-          <thead>
-            <tr className="bg-base-300">
-              <th className="text-lg font-bold">Imagen</th>
-              <th className="text-lg font-bold">Título</th>
-              <th className="text-lg font-bold">Precio</th>
-              <th className="text-lg font-bold">Estado</th>
-              <th className="text-lg font-bold">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Producto 1 */}
-            <tr>
-              <td>
-                <div className="flex items-center space-x-3">
-                  <div className="avatar">
-                    <div className="mask mask-squircle w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">
-                      📱
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <div className="font-bold">iPhone 13 Pro</div>
-                  <div className="text-sm opacity-50">Telefonía · Nuevo</div>
-                </div>
-              </td>
-              <td>
-                <span className="font-bold text-lg">$899</span>
-              </td>
-              <td>
-                <span className="badge badge-success badge-lg text-white">Activo</span>
-              </td>
-              <td>
-                <div className="flex gap-2">
-                  <button className="btn btn-outline btn-primary btn-sm">
-                    Editar
-                  </button>
-                  <button className="btn btn-outline btn-error btn-sm">
-                    Eliminar
-                  </button>
-                </div>
-              </td>
-            </tr>
+  const getEstadoBadge = (condicion) => {
+    const config = {
+      nuevo: { clase: "badge-success", texto: "Nuevo" },
+      usado: { clase: "badge-warning", texto: "Usado" },
+    };
 
-            {/* Producto 2 */}
-            <tr>
-              <td>
-                <div className="flex items-center space-x-3">
-                  <div className="avatar">
-                    <div className="mask mask-squircle w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center text-white font-bold">
-                      💻
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <div className="font-bold">MacBook Air M2</div>
-                  <div className="text-sm opacity-50">Computación · Como nuevo</div>
-                </div>
-              </td>
-              <td>
-                <span className="font-bold text-lg">$1,199</span>
-              </td>
-              <td>
-                <span className="badge badge-warning badge-lg text-white">Pausado</span>
-              </td>
-              <td>
-                <div className="flex gap-2">
-                  <button className="btn btn-outline btn-primary btn-sm">
-                    Editar
-                  </button>
-                  <button className="btn btn-outline btn-error btn-sm">
-                    Eliminar
-                  </button>
-                </div>
-              </td>
-            </tr>
+    const { clase, texto } = config[condicion];
+    return (
+      <span className={`badge ${clase} badge-lg text-white font-semibold`}>
+        {texto}
+      </span>
+    );
+  };
 
-            {/* Producto 3 */}
-            <tr>
-              <td>
-                <div className="flex items-center space-x-3">
-                  <div className="avatar">
-                    <div className="mask mask-squircle w-12 h-12 bg-gradient-to-r from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">
-                      🎧
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <div className="font-bold">AirPods Pro</div>
-                  <div className="text-sm opacity-50">Audio · Usado</div>
-                </div>
-              </td>
-              <td>
-                <span className="font-bold text-lg">$199</span>
-              </td>
-              <td>
-                <span className="badge badge-success badge-lg text-white">Activo</span>
-              </td>
-              <td>
-                <div className="flex gap-2">
-                  <button className="btn btn-outline btn-primary btn-sm">
-                    Editar
-                  </button>
-                  <button className="btn btn-outline btn-error btn-sm">
-                    Eliminar
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  const getEstadisticas = (publicacion) => {
+    return (
+      <div className="flex items-center space-x-4 text-xs text-base-content/60">
+        <div className="flex items-center space-x-1">
+          <span>👁️</span>
+          <span>{publicacion.vistas} vistas</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <span>❤️</span>
+          <span>{publicacion.favoritos} favs</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <span>📅</span>
+          <span>{publicacion.fecha}</span>
+        </div>
       </div>
+    );
+  };
 
-      {/* Botón para agregar más publicaciones */}
-      <div className="flex justify-end mt-6">
-        <button className="btn btn-primary gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          <Link
-              to="/nuevo"
-              className="text-primary hover:underline ml-1"
+  return (
+    <div className="min-h-screen bg-base-200 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="bg-base-100 rounded-2xl shadow-lg p-8 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-6 lg:mb-0">
+              <h1 className="text-4xl font-bold text-base-content mb-2">
+                Mis Publicaciones
+              </h1>
+              <p className="text-base-content/70 text-lg">
+                Gestiona y revisa el rendimiento de tus productos publicados
+              </p>
+            </div>
+
+            {/* Estadísticas rápidas */}
+            <div className="">
+              <div className="bg-primary/10 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {publicaciones.length}
+                </div>
+                <div className="text-sm text-base-content/70">Total</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Botón de nueva publicación */}
+        <div className="flex justify-end mt-4 mb-8">
+          <Link to="/nuevo" className="btn btn-primary btn-lg gap-3 px-8">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              Nueva Publicación
-            </Link>
-          
-        </button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Crear Nueva Publicación
+          </Link>
+        </div>
+
+        {/* Lista de publicaciones */}
+        <div className="space-y-4">
+          {publicaciones.map((publicacion) => (
+            <div
+              key={publicacion.id}
+              className="bg-base-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <div className="p-6">
+                <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                  {/* Imagen del producto */}
+                  <div className="flex-shrink-0">
+                    <div
+                      className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${publicacion.colorGradiente} flex items-center justify-center text-3xl text-white shadow-lg`}
+                    >
+                      {publicacion.imagen}
+                    </div>
+                  </div>
+
+                  {/* Información principal */}
+                  <div className="flex-grow">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
+                      <div>
+                        <h3 className="text-xl font-bold text-base-content mb-1">
+                          {publicacion.titulo}
+                        </h3>
+                        <div className="flex items-center space-x-4 mb-2">
+                          <span className="text-base-content/70 text-sm">
+                            {publicacion.categoria}
+                          </span>
+                          {getEstadoBadge(publicacion.condicion)}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 lg:mt-0 lg:text-right">
+                        <div className="text-3xl font-bold text-primary mb-2">
+                          ${publicacion.precio}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Acciones */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
+                      <div className="flex flex-wrap gap-2">
+                        <button className="btn btn-outline btn-error btn-sm gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Paginación */}
       </div>
     </div>
   );
