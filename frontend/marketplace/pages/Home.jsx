@@ -211,7 +211,7 @@ export default function Home() {
 
                     {/* Botón para ver más productos */}
                     <div className="text-center mt-12">
-                        <button className="btn btn-outline btn-primary btn-wide">
+                        <button className="btn btn-outline btn-primary btn-wide" onClick={() => navigate("/catalogo")}>
                             Ver Todos los Productos
                         </button>
                     </div>
