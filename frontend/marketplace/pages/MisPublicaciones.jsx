@@ -43,24 +43,7 @@ export default function MisPublicaciones() {
     );
   };
 
-  const getEstadisticas = (publicacion) => {
-    return (
-      <div className="flex items-center space-x-4 text-xs text-base-content/60">
-        <div className="flex items-center space-x-1">
-          <span>👁️</span>
-          <span>{publicacion.vistas} vistas</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <span>❤️</span>
-          <span>{publicacion.favoritos} favs</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <span>📅</span>
-          <span>{publicacion.fecha}</span>
-        </div>
-      </div>
-    );
-  };
+ 
 
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
