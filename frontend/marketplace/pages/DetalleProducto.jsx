@@ -87,15 +87,6 @@ export default function ProductDetail() {
     navigate(-1);
   };
 
-  const handleAddToCart = () => {
-    console.log("Producto agregado:", product);
-    // Aquí podrías agregar una notificación
-  };
-
-  const handleBuyNow = () => {
-    console.log("Comprar ahora:", product);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-base-200 flex justify-center items-center">
