@@ -1,12 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useCart } from "../src/context/CartContext";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const { addToCart, isInCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+  const navigate = useNavigate();
 
   // Datos de prueba mejorados
   const productsData = {
@@ -211,8 +213,8 @@ export default function ProductDetail() {
             {/* Acciones */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={handleAddToCart}
-                disabled={product.stock === 0}
+                onClick={() => addToCart(product)}
+                disabled={isInCart(product.id)}
                 className="btn btn-primary btn-lg flex-1 gap-2"
               >
                 <svg
@@ -231,13 +233,13 @@ export default function ProductDetail() {
                 </svg>
                 Agregar al Carrito
               </button>
-              <button
+              {/* <button
                 onClick={handleBuyNow}
                 disabled={product.stock === 0}
                 className="btn btn-secondary btn-lg flex-1"
               >
                 Comprar Ahora
-              </button>
+              </button> */}
             </div>
 
             {/* Características rápidas */}
