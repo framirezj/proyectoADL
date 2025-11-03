@@ -40,11 +40,13 @@ CREATE TABLE IF NOT EXISTS publicaciones (
 -- =====================================
 -- INSERTS DE USUARIOS
 -- =====================================
+
 INSERT INTO usuarios (username, email, password, nombre, rol)
 VALUES 
-('fran_r', 'fran@example.com', 'Abc123', 'Francisco Ramírez', 'user'),
-('maria_p', 'maria@example.com', 'Abc123', 'María Pérez', 'user'),
-('jose_g', 'jose@example.com', 'Abc123', 'José González', 'user');
+('fran_r', 'fran@example.com', '$2b$10$QIOa6Ptt6UJImjphLweXwOXe4yGgZCmJ98KmWx3qnOfLOYa7QbNQ6', 'Francisco Ramírez', 'user'),
+('maria_p', 'maria@example.com', '$2b$10$QIOa6Ptt6UJImjphLweXwOXe4yGgZCmJ98KmWx3qnOfLOYa7QbNQ6', 'María Pérez', 'user'),
+('jose_g', 'jose@example.com', '$2b$10$QIOa6Ptt6UJImjphLweXwOXe4yGgZCmJ98KmWx3qnOfLOYa7QbNQ6', 'José González', 'user');
+
 
 -- =====================================
 -- INSERTS DE CATEGORÍAS
