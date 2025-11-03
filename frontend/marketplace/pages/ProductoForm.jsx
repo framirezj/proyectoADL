@@ -58,8 +58,7 @@ export default function ProductoForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData)
-    /* setLoading(true);
+    setLoading(true);
     setError("");
 
     // Validaciones básicas
@@ -117,7 +116,6 @@ export default function ProductoForm() {
         navigate("/mispublicaciones");
       }
 
-      console.log(formData);
     } catch (error) {
       console.error("Error al publicar producto:", error);
 
@@ -132,7 +130,7 @@ export default function ProductoForm() {
       }
     } finally {
       setLoading(false);
-    } */
+    } 
   };
 
   return (
