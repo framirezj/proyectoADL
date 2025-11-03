@@ -9,6 +9,7 @@ import pool from "./config/db.js";
 import usuariosRouter from "./routes/usuarios.js";
 import authRouter from "./routes/auth.js";
 import productoRouter from "./routes/producto.js"
+import categoriaRouter from "./routes/categoria.js"
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api", usuariosRouter);
 app.use("/api/producto", productoRouter)
+app.use("/api/categoria", categoriaRouter)
 
 // 404
 app.use((req, res) => {
