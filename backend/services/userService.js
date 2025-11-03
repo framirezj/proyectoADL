@@ -1,4 +1,5 @@
 import pool from "../config/db.js";
+import { selectPublicacionesUser } from "../models/userModel.js";
 
 export async function findById(id) {
   const { rows } = await pool.query(
@@ -8,4 +9,11 @@ export async function findById(id) {
     [id]
   );
   return rows[0] || null;
+}
+
+
+export async function publicacionesUser(userId) {
+  console.log("Ejecutando publicacionesUser con userId:", userId);
+  return await selectPublicacionesUser(userId)
+  
 }

@@ -1,4 +1,4 @@
-import { findById } from "../services/userService.js";
+import { findById, publicacionesUser } from "../services/userService.js";
 
 export async function getMe(req, res) {
   try {
@@ -9,5 +9,19 @@ export async function getMe(req, res) {
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: "Error interno del servidor" });
+  }
+}
+
+
+
+export async function getPublicacionesUser(req, res) {
+  try {
+    const data = await publicacionesUser(parseInt(req.user.userId));
+    if (!data) {
+      return res.status(404).json({ error: "Recurso no encontrado" });
+    }
+    res.json(data);
+  } catch (err) {
+    res.status(500).json(err);
   }
 }

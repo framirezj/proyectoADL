@@ -1,15 +1,14 @@
-import { obtenerCategorias } from "../services/categoriaService.js"
+import { obtenerCategorias } from "../services/categoriaService.js";
 
 export async function getCategorias(req, res) {
-    try {
+  try {
+    const categorias = await obtenerCategorias();
 
-        const categorias = await obtenerCategorias()
-
-        res.status(200).json({
-            message: "Categorias",
-            categorias
-        })
-    } catch (error) {
-        
-    }
+    res.status(200).json({
+      message: "Categorias",
+      categorias,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
 }
