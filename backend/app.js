@@ -8,8 +8,8 @@ import morgan from "morgan";
 import pool from "./config/db.js";
 import usuariosRouter from "./routes/usuarios.js";
 import authRouter from "./routes/auth.js";
-import productoRouter from "./routes/producto.js"
-import categoriaRouter from "./routes/categoria.js"
+import productoRouter from "./routes/producto.js";
+import categoriaRouter from "./routes/categoria.js";
 
 const app = express();
 
@@ -41,8 +41,8 @@ app.use("/uploads", express.static("uploads"));
 // Routers
 app.use("/api/auth", authRouter);
 app.use("/api", usuariosRouter);
-app.use("/api/producto", productoRouter)
-app.use("/api/categoria", categoriaRouter)
+app.use("/api/producto", productoRouter);
+app.use("/api/categoria", categoriaRouter);
 
 // 404
 app.use((req, res) => {
@@ -58,6 +58,10 @@ app.use((err, req, res, next) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server On: http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`Server On: http://localhost:${port}`);
+  });
+}
+
+export default app;
