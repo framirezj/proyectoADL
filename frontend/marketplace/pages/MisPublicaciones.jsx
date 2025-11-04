@@ -55,6 +55,18 @@ export default function MisPublicaciones() {
     fetchPublicaciones();
   }, []);
 
+  const handleDelete = async (productoId) => {
+    try {
+      await api.delete(`/producto/${productoId}`);
+
+      // actulizar la lista
+      setPublicaciones((prevPublicaciones) => prevPublicaciones.filter((item) => item.id !== productoId))
+
+    } catch (error) {
+      console.error('Error eliminando producto:', error);
+    }
+  }
+
   const getEstadoBadge = (condicion) => {
     const config = {
       nuevo: { clase: "badge-success", texto: "Nuevo" },
@@ -168,7 +180,7 @@ export default function MisPublicaciones() {
                     {/* Acciones */}
                     <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
                       <div className="flex flex-wrap gap-2">
-                        <button className="btn btn-outline btn-error btn-sm gap-2">
+                        <button className="btn btn-outline btn-error btn-sm gap-2" onClick={() => handleDelete(publicacion.id)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4"
