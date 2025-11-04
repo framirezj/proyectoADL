@@ -141,9 +141,9 @@ export default function MisPublicaciones() {
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                   {/* Imagen del producto */}
                   <div className="flex-shrink-0">
-                    {publicacion.url_imagen ? (
+                    {publicacion.imagen ? (
                       <img
-                        src={publicacion.url_imagen}
+                        src={publicacion.imagen}
                         alt={publicacion.titulo}
                         className="w-24 h-24 object-cover rounded-2xl shadow-lg"
                       />
