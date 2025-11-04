@@ -35,6 +35,9 @@ app.get("/", (req, res) => {
   });
 });
 
+// Servir archivos estáticos desde la carpeta "uploads"
+app.use("/uploads", express.static("uploads"));
+
 // Routers
 app.use("/api/auth", authRouter);
 app.use("/api", usuariosRouter);
