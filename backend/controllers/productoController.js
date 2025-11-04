@@ -2,6 +2,7 @@
 import {
   crearProducto,
   borrarProducto as borrar,
+  obtenerPublicaciones as obtener,
 } from "../services/productoService.js";
 
 export async function addProducto(req, res) {
@@ -43,5 +44,17 @@ export async function borrarProducto(req, res) {
     res
       .status(500)
       .json({ error: error.message || "Error al remover producto" });
+  }
+}
+
+export async function obtenerPublicaciones(req, res) {
+  try {
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    res.status(200).json(await obtener(baseUrl));
+  } catch (error) {
+    console.error("Error al obtener los registros:", error.message);
+    res
+      .status(500)
+      .json({ error: error.message || "Error al obtener los registros" });
   }
 }

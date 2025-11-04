@@ -1,9 +1,13 @@
-import { deleteProducto, insertProducto } from "../models/productoModel.js";
+import {
+  deleteProducto,
+  insertProducto,
+  selectProductos,
+} from "../models/productoModel.js";
 
 export async function crearProducto(data) {
-  const { userId, titulo, categoria, condicion, descripcion, precio, imagen } = data;
+  const { userId, titulo, categoria, condicion, descripcion, precio, imagen } =
+    data;
 
-  
   // validación simple
   if (!titulo || !precio) {
     throw new Error("El título y el precio son obligatorios");
@@ -24,5 +28,17 @@ export async function crearProducto(data) {
 }
 
 export async function borrarProducto(productoId) {
-  return await deleteProducto(productoId)
+  return await deleteProducto(productoId);
 }
+
+export async function obtenerPublicaciones(baseUrl) {
+  const publicaciones = await selectProductos();
+  return {
+    publicaciones: publicaciones.map((producto) => ({
+      ...producto,
+      imagen: producto.url_imagen ? `${baseUrl}/uploads/${producto.url_imagen}` : null,
+    })),
+  };
+}
+
+

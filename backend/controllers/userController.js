@@ -18,7 +18,6 @@ export async function getPublicacionesUser(req, res) {
   try {
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
-    console.log("baseurl", baseUrl)
 
     const data = await publicacionesUser(parseInt(req.user.userId), baseUrl);
     if (!data) {

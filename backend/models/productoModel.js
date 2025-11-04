@@ -34,7 +34,14 @@ export async function deleteProducto(productoId) {
   `;
   const values = [productoId];
 
-  const result = await pool.query(query,values)
+  const result = await pool.query(query, values);
+}
 
+export async function selectProductos() {
+  const query = `
+    SELECT * FROM publicaciones;
+  `;
+  const { rows } = await pool.query(query);
 
+  return rows;
 }
