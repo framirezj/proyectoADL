@@ -1,5 +1,8 @@
 // controllers/productoController.js
-import { crearProducto } from "../services/productoService.js";
+import {
+  crearProducto,
+  borrarProducto as borrar,
+} from "../services/productoService.js";
 
 export async function addProducto(req, res) {
   try {
@@ -7,7 +10,7 @@ export async function addProducto(req, res) {
     const imagen = req.file ? req.file.filename : null;
     const userId = req.user.userId;
 
-     const producto = await crearProducto({
+    const producto = await crearProducto({
       userId,
       titulo,
       categoria,
@@ -17,11 +20,10 @@ export async function addProducto(req, res) {
       imagen,
     });
 
-
     res.status(201).json({
       message: "Producto creado correctamente",
       producto,
-    }); 
+    });
   } catch (error) {
     console.error("Error en addProducto:", error.message);
     res
@@ -30,13 +32,16 @@ export async function addProducto(req, res) {
   }
 }
 
-//esto llega:
-
-/*
-categoria:"electronica"
-condicion:"usado"
-descripcion:"poco uso"
-imagen:File {name: 'telefono.png', lastModified: 1761676407085, lastModifiedDate: Tue Oct 28 2025 15:33:27 GMT-0300 (hora de verano de Chile), webkitRelativePath: '', size: 732654, …}
-precio:"9.99"
-titulo:"iphone 13"
-*/
+export async function borrarProducto(req, res) {
+  try {
+    const { id: productoId } = req.params;
+    console.log(productoId);
+    await borrar(productoId);
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error al remover producto:", error.message);
+    res
+      .status(500)
+      .json({ error: error.message || "Error al remover producto" });
+  }
+}
