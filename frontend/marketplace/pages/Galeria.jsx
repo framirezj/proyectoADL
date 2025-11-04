@@ -1,103 +1,87 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
 import { useCart } from "../src/context/CartContext";
+import { useCategories } from "../src/context/CategoriaContext";
+
+// Datos de prueba para los productos
+const productsData = [
+  {
+    id: 1,
+    name: "iPhone 14 Pro",
+    price: 999,
+    category: "Electrónica",
+    image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400",
+    description: "El último smartphone de Apple",
+  },
+  {
+    id: 2,
+    name: "Samsung Galaxy S23",
+    price: 799,
+    category: "Electrónica",
+    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400",
+    description: "Potente smartphone Android",
+  },
+  {
+    id: 3,
+    name: "Camiseta Básica",
+    price: 25,
+    category: "Moda",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+    description: "Camiseta de algodón 100%",
+  },
+  {
+    id: 4,
+    name: "Zapatos Deportivos",
+    price: 120,
+    category: "Moda",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
+    description: "Zapatos para running",
+  },
+  {
+    id: 5,
+    name: "Sofá Moderno",
+    price: 450,
+    category: "Hogar",
+    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+    description: "Sofá cómodo para tu sala",
+  },
+  {
+    id: 6,
+    name: "Lámpara de Mesa",
+    price: 35,
+    category: "Hogar",
+    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400",
+    description: "Iluminación moderna",
+  },
+  {
+    id: 7,
+    name: "Pelota de Fútbol",
+    price: 30,
+    category: "Deportes",
+    image: "https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=400",
+    description: "Pelota oficial tamaño 5",
+  },
+  {
+    id: 8,
+    name: "Raqueta de Tenis",
+    price: 85,
+    category: "Deportes",
+    image: "https://images.unsplash.com/photo-1587280501635-68ba0e82c6e8?w=400",
+    description: "Raqueta profesional",
+  },
+  {
+    id: 9,
+    name: "El Señor de los Anillos",
+    price: 20,
+    category: "Otros",
+    image: "https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?w=400",
+    description: "Clásico de la fantasía épica",
+  },
+];
+
 
 const ProductGallery = () => {
+  const { categories, loading } = useCategories();
   const { addToCart, isInCart } = useCart();
-  // Datos de prueba para las categorías
-  const categories = [
-    { id: 1, name: "Todos", value: "all" },
-    { id: 2, name: "Electrónicos", value: "electronics" },
-    { id: 3, name: "Ropa", value: "clothing" },
-    { id: 4, name: "Hogar", value: "home" },
-    { id: 5, name: "Deportes", value: "sports" },
-    { id: 6, name: "Libros", value: "books" },
-  ];
-
-  // Datos de prueba para los productos
-  const productsData = [
-    {
-      id: 1,
-      name: "iPhone 14 Pro",
-      price: 999,
-      category: "electronics",
-      image:
-        "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400",
-      description: "El último smartphone de Apple",
-    },
-    {
-      id: 2,
-      name: "Samsung Galaxy S23",
-      price: 799,
-      category: "electronics",
-      image:
-        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400",
-      description: "Potente smartphone Android",
-    },
-    {
-      id: 3,
-      name: "Camiseta Básica",
-      price: 25,
-      category: "clothing",
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
-      description: "Camiseta de algodón 100%",
-    },
-    {
-      id: 4,
-      name: "Zapatos Deportivos",
-      price: 120,
-      category: "clothing",
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-      description: "Zapatos para running",
-    },
-    {
-      id: 5,
-      name: "Sofá Moderno",
-      price: 450,
-      category: "home",
-      image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
-      description: "Sofá cómodo para tu sala",
-    },
-    {
-      id: 6,
-      name: "Lámpara de Mesa",
-      price: 35,
-      category: "home",
-      image:
-        "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400",
-      description: "Iluminación moderna",
-    },
-    {
-      id: 7,
-      name: "Pelota de Fútbol",
-      price: 30,
-      category: "sports",
-      image:
-        "https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=400",
-      description: "Pelota oficial tamaño 5",
-    },
-    {
-      id: 8,
-      name: "Raqueta de Tenis",
-      price: 85,
-      category: "sports",
-      image:
-        "https://images.unsplash.com/photo-1587280501635-68ba0e82c6e8?w=400",
-      description: "Raqueta profesional",
-    },
-    {
-      id: 9,
-      name: "El Señor de los Anillos",
-      price: 20,
-      category: "books",
-      image:
-        "https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?w=400",
-      description: "Clásico de la fantasía épica",
-    },
-  ];
-
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [products] = useState(productsData);
 
@@ -122,17 +106,26 @@ const ProductGallery = () => {
                 Categorías
               </h2>
               <div className="space-y-2">
+                <button
+                  className={`btn btn-block justify-start ${
+                    selectedCategory === "all" ? "btn-primary" : "btn-ghost"
+                  }`}
+                  onClick={() => setSelectedCategory("all")}
+                >
+                  Todos
+                </button>
+
                 {categories.map((category) => (
                   <button
                     key={category.id}
                     className={`btn btn-block justify-start ${
-                      selectedCategory === category.value
+                      selectedCategory === category.nombre
                         ? "btn-primary"
                         : "btn-ghost"
                     }`}
-                    onClick={() => setSelectedCategory(category.value)}
+                    onClick={() => setSelectedCategory(category.nombre)}
                   >
-                    {category.name}
+                    {category.nombre}
                   </button>
                 ))}
               </div>
@@ -142,8 +135,8 @@ const ProductGallery = () => {
                 <p className="font-semibold">Filtro activo:</p>
                 <p className="text-lg">
                   {
-                    categories.find((cat) => cat.value === selectedCategory)
-                      ?.name
+                    categories.find((cat) => cat.nombre === selectedCategory)
+                      ?.nombre
                   }
                 </p>
                 <p className="text-sm mt-2">
@@ -187,8 +180,8 @@ const ProductGallery = () => {
                         <div className="badge badge-secondary">
                           {
                             categories.find(
-                              (cat) => cat.value === product.category
-                            )?.name
+                              (cat) => cat.nombre === product.category
+                            )?.nombre
                           }
                         </div>
                       </div>
@@ -199,8 +192,11 @@ const ProductGallery = () => {
                         <span className="text-2xl font-bold text-primary">
                           ${product.price}
                         </span>
-                        <button className="btn btn-primary btn-sm" onClick={() => addToCart(product)}
-        disabled={isInCart(product.id)}>
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => addToCart(product)}
+                          disabled={isInCart(product.id)}
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5"
@@ -215,7 +211,9 @@ const ProductGallery = () => {
                               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                             />
                           </svg>
-                          {isInCart(product.id) ? 'En el carrito' : 'Agregar al carrito'}
+                          {isInCart(product.id)
+                            ? "En el carrito"
+                            : "Agregar al carrito"}
                         </button>
                       </div>
                     </div>
