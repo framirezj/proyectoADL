@@ -45,3 +45,14 @@ export async function selectProductos() {
 
   return rows;
 }
+
+export async function selectProducto(productoId){
+  const query = `
+    SELECT * FROM publicaciones WHERE id = $1;
+  `;
+  const values = [productoId];
+
+  const { rows } = await pool.query(query, values);
+
+  return rows[0]
+}

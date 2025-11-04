@@ -2,6 +2,7 @@ import {
   deleteProducto,
   insertProducto,
   selectProductos,
+  selectProducto
 } from "../models/productoModel.js";
 
 export async function crearProducto(data) {
@@ -36,9 +37,20 @@ export async function obtenerPublicaciones(baseUrl) {
   return {
     publicaciones: publicaciones.map((producto) => ({
       ...producto,
-      url_imagen: producto.url_imagen ? `${baseUrl}/uploads/${producto.url_imagen}` : null,
+      url_imagen: producto.url_imagen
+        ? `${baseUrl}/uploads/${producto.url_imagen}`
+        : null,
     })),
   };
 }
 
+export async function obtenerPublicacion(productoId, baseUrl) {
+  const result = await selectProducto(productoId);
+
+  return {
+    ...result,
+    imagen: `${baseUrl}${result.url_imagen}`
+  }
+
+  };
 

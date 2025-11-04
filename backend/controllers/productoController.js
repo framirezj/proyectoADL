@@ -3,6 +3,7 @@ import {
   crearProducto,
   borrarProducto as borrar,
   obtenerPublicaciones as obtener,
+  obtenerPublicacion as obtenerById
 } from "../services/productoService.js";
 
 export async function addProducto(req, res) {
@@ -56,4 +57,10 @@ export async function obtenerPublicaciones(req, res) {
       .status(500)
       .json({ error: error.message || "Error al obtener los registros" });
   }
+}
+
+export async function obtenerPublicacion(req, res) {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const { id: productoId } = req.params
+  res.status(200).json(await obtenerById(productoId, baseUrl));
 }
