@@ -1,4 +1,4 @@
-import { insertProducto } from "../models/productoModel.js";
+import { deleteProducto, insertProducto } from "../models/productoModel.js";
 
 export async function crearProducto(data) {
   const { userId, titulo, categoria, condicion, descripcion, precio, imagen } = data;
@@ -21,4 +21,8 @@ export async function crearProducto(data) {
   });
 
   return nuevoProducto;
+}
+
+export async function borrarProducto(productoId) {
+  return await deleteProducto(productoId)
 }

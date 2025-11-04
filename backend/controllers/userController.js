@@ -16,7 +16,11 @@ export async function getMe(req, res) {
 
 export async function getPublicacionesUser(req, res) {
   try {
-    const data = await publicacionesUser(parseInt(req.user.userId));
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    console.log("baseurl", baseUrl)
+
+    const data = await publicacionesUser(parseInt(req.user.userId), baseUrl);
     if (!data) {
       return res.status(404).json({ error: "Recurso no encontrado" });
     }

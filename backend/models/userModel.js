@@ -11,9 +11,11 @@ export async function selectPublicacionesUser(userId) {
         JSON_BUILD_OBJECT(
           'id', p.id,
           'titulo', p.titulo,
+          'imagen', p.url_imagen,
           'precio', p.precio,
           'categoria', c.nombre,
-          'fecha_creacion', p.fecha_creacion
+          'fecha_creacion', p.fecha_creacion,
+          'estado', p.estado
         )
       ) AS publicaciones
     FROM usuarios u
@@ -24,7 +26,7 @@ export async function selectPublicacionesUser(userId) {
     ORDER BY total_publicaciones DESC `;
     const values = [userId];
     const resp = await pool.query(query, values);
-    return resp.rows;
+    return resp.rows[0];
   } catch (error) {
     console.error("❌ Error ejecutando selectPublicacionesUser:", error);
   }

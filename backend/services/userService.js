@@ -11,9 +11,13 @@ export async function findById(id) {
   return rows[0] || null;
 }
 
+export async function publicacionesUser(userId, baseUrl) {
+  const { publicaciones } = await selectPublicacionesUser(userId);
 
-export async function publicacionesUser(userId) {
-  console.log("Ejecutando publicacionesUser con userId:", userId);
-  return await selectPublicacionesUser(userId)
-  
+  return {
+    publicaciones: publicaciones.map((producto) => ({
+      ...producto,
+      imagen: producto.imagen ? `${baseUrl}/uploads/${producto.imagen}` : null,
+    })),
+  };
 }

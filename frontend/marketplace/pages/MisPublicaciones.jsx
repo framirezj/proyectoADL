@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../src/api/axiosConfig";
 
 export default function MisPublicaciones() {
+  const [publicaciones, setPublicaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   // Datos de ejemplo para las publicaciones
-  const publicaciones = [
+  /* const publicaciones = [
     {
       id: 1,
       titulo: "iPhone 13 Pro",
@@ -27,7 +33,39 @@ export default function MisPublicaciones() {
       favoritos: 12,
       fecha: "2024-01-10",
     },
-  ];
+  ]; */
+
+  useEffect(() => {
+    const fetchPublicaciones = async () => {
+      try {
+        setLoading(true);
+        // 🔹 Llamada a tu API
+        const response = await api.get("/usuarios/publicaciones");
+
+        // 🔹 Extraer solo el array de publicaciones
+        setPublicaciones(response.data.publicaciones);
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar las publicaciones");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPublicaciones();
+  }, []);
+
+  const handleDelete = async (productoId) => {
+    try {
+      await api.delete(`/producto/${productoId}`);
+
+      // actulizar la lista
+      setPublicaciones((prevPublicaciones) => prevPublicaciones.filter((item) => item.id !== productoId))
+
+    } catch (error) {
+      console.error('Error eliminando producto:', error);
+    }
+  }
 
   const getEstadoBadge = (condicion) => {
     const config = {
@@ -43,7 +81,7 @@ export default function MisPublicaciones() {
     );
   };
 
- 
+  if (loading) return <p>Cargando publicaciones...</p>;
 
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
@@ -104,11 +142,17 @@ export default function MisPublicaciones() {
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                   {/* Imagen del producto */}
                   <div className="flex-shrink-0">
-                    <div
-                      className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${publicacion.colorGradiente} flex items-center justify-center text-3xl text-white shadow-lg`}
-                    >
-                      {publicacion.imagen}
-                    </div>
+                    {publicacion.imagen ? (
+                      <img
+                        src={publicacion.imagen}
+                        alt={publicacion.titulo}
+                        className="w-24 h-24 object-cover rounded-2xl shadow-lg"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-2xl bg-base-300 flex items-center justify-center text-gray-400">
+                        Sin imagen
+                      </div>
+                    )}
                   </div>
 
                   {/* Información principal */}
@@ -122,7 +166,7 @@ export default function MisPublicaciones() {
                           <span className="text-base-content/70 text-sm">
                             {publicacion.categoria}
                           </span>
-                          {getEstadoBadge(publicacion.condicion)}
+                          {getEstadoBadge(publicacion.estado)}
                         </div>
                       </div>
 
@@ -136,7 +180,7 @@ export default function MisPublicaciones() {
                     {/* Acciones */}
                     <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
                       <div className="flex flex-wrap gap-2">
-                        <button className="btn btn-outline btn-error btn-sm gap-2">
+                        <button className="btn btn-outline btn-error btn-sm gap-2" onClick={() => handleDelete(publicacion.id)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4"

@@ -24,7 +24,7 @@ const GlobalLoading = () => (
 );
 
 export default function AppRouter() {
-  const { loading } = useAuth
+  const { loading } = useAuth()
 
     if (loading) {
     return <GlobalLoading />;
