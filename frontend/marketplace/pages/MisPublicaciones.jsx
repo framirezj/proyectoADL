@@ -41,7 +41,6 @@ export default function MisPublicaciones() {
         setLoading(true);
         // 🔹 Llamada a tu API
         const response = await api.get("/usuarios/publicaciones");
-
         // 🔹 Extraer solo el array de publicaciones
         setPublicaciones(response.data.publicaciones);
       } catch (err) {

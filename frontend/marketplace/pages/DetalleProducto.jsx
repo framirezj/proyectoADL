@@ -1,16 +1,40 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "../src/context/CartContext";
+import api from "../src/api/axiosConfig";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { addToCart, isInCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(0);
   const navigate = useNavigate();
 
-  // Datos de prueba mejorados
+
+  //data
+  useEffect(() => {
+    const fetchPublicaciones = async () => {
+      try {
+        setLoading(true);
+        // 🔹 Llamada a tu API
+        const response = await api.get(`/producto/${id}`);
+        
+       // 🔹 Extraer solo el array de publicaciones
+        setProduct(response.data);
+      } catch (err) {
+        console.error(err);
+        //setError("Error al cargar las publicaciones");
+      } finally {
+        setLoading(false);
+        
+      }
+    };
+
+    fetchPublicaciones();
+    
+  }, [id]);
+
+/*   // Datos de prueba mejorados
   const productsData = {
     1: {
       id: 1,
@@ -81,7 +105,7 @@ export default function ProductDetail() {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id]); */
 
   const handleGoBack = () => {
     navigate(-1);
@@ -166,8 +190,8 @@ export default function ProductDetail() {
             {/* Imagen principal */}
             <div className="bg-base-100 rounded-2xl shadow-lg overflow-hidden">
               <img
-                src={product.images[selectedImage]}
-                alt={product.name}
+                src={product.imagen}
+                alt={product.titulo}
                 className="w-full h-96 object-cover hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -180,11 +204,11 @@ export default function ProductDetail() {
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-4xl font-bold text-base-content leading-tight">
-                    {product.name}
+                    {product.titulo}
                   </h1>
                   <div className="flex items-center space-x-4 mt-2">
                     <div className="badge badge-secondary badge-lg">
-                      {product.category}
+                      {product.category || 'buscar categoria'}
                     </div>
                   </div>
                 </div>
@@ -194,7 +218,7 @@ export default function ProductDetail() {
             {/* Precio */}
             <div className="bg-primary/10 rounded-2xl p-6">
               <p className="text-4xl font-bold text-primary">
-                ${product.price}
+                ${product.precio}
               </p>
               <p className="text-sm text-base-content/70 mt-1">
                 IVA incluido • Envío gratis
@@ -262,7 +286,7 @@ export default function ProductDetail() {
             <h3 className="text-2xl font-bold">Descripción del Producto</h3>
             <div className="bg-base-100 rounded-2xl p-6 shadow-lg">
               <p className="text-base-content/80 leading-relaxed">
-                {product.fullDescription}
+                {product.descripcion}
               </p>
             </div>
           </div>
