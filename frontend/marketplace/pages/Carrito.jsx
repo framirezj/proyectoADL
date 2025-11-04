@@ -59,7 +59,7 @@ const ShoppingCart = () => {
                   >
                     <figure className="w-32 h-32 p-2">
                       <img
-                        src={item.url_imagen}
+                        src={item.imagen}
                         alt={item.titulo}
                         className="w-full h-full object-cover rounded-lg"
                       />

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useCart } from "../src/context/CartContext";
 import { useCategories } from "../src/context/CategoriaContext";
 import api from "../src/api/axiosConfig";
+import { useNavigate } from "react-router-dom";
 
 // Datos de prueba para los productos
 /*  const productsData = [
@@ -86,6 +87,11 @@ const ProductGallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate()
+
+  const handleDetails = (productId) => {
+        navigate(`/detalle/${productId}`);
+    }
 
   //data
   useEffect(() => {
@@ -193,10 +199,11 @@ const ProductGallery = () => {
                   <div
                     key={product.id}
                     className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
+                    
                   >
-                    <figure className="px-4 pt-4">
+                    <figure className="px-4 pt-4 cursor-pointer group" onClick={() => handleDetails(product.id)}>
                       <img
-                        src={product.url_imagen}
+                        src={product.imagen}
                         alt={product.titulo}
                         className="rounded-xl h-48 w-full object-cover"
                       />

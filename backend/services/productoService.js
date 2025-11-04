@@ -37,7 +37,7 @@ export async function obtenerPublicaciones(baseUrl) {
   return {
     publicaciones: publicaciones.map((producto) => ({
       ...producto,
-      url_imagen: producto.url_imagen
+      imagen: producto.url_imagen
         ? `${baseUrl}/uploads/${producto.url_imagen}`
         : null,
     })),
@@ -49,7 +49,7 @@ export async function obtenerPublicacion(productoId, baseUrl) {
 
   return {
     ...result,
-    imagen: `${baseUrl}${result.url_imagen}`
+    imagen: `${baseUrl}/uploads/${result.url_imagen}`
   }
 
   };
