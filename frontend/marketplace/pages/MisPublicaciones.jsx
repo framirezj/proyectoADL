@@ -41,7 +41,6 @@ export default function MisPublicaciones() {
         setLoading(true);
         // 🔹 Llamada a tu API
         const response = await api.get("/usuarios/publicaciones");
-
         // 🔹 Extraer solo el array de publicaciones
         setPublicaciones(response.data.publicaciones);
       } catch (err) {
@@ -142,9 +141,9 @@ export default function MisPublicaciones() {
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                   {/* Imagen del producto */}
                   <div className="flex-shrink-0">
-                    {publicacion.imagen ? (
+                    {publicacion.url_imagen ? (
                       <img
-                        src={publicacion.imagen}
+                        src={publicacion.url_imagen}
                         alt={publicacion.titulo}
                         className="w-24 h-24 object-cover rounded-2xl shadow-lg"
                       />

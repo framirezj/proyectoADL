@@ -36,7 +36,7 @@ export async function obtenerPublicaciones(baseUrl) {
   return {
     publicaciones: publicaciones.map((producto) => ({
       ...producto,
-      imagen: producto.url_imagen ? `${baseUrl}/uploads/${producto.url_imagen}` : null,
+      url_imagen: producto.url_imagen ? `${baseUrl}/uploads/${producto.url_imagen}` : null,
     })),
   };
 }

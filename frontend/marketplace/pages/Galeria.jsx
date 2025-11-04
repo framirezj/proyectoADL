@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../src/context/CartContext";
 import { useCategories } from "../src/context/CategoriaContext";
+import api from "../src/api/axiosConfig";
 
 // Datos de prueba para los productos
-const productsData = [
+/*  const productsData = [
   {
     id: 1,
     name: "iPhone 14 Pro",
@@ -76,20 +77,46 @@ const productsData = [
     image: "https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?w=400",
     description: "Clásico de la fantasía épica",
   },
-];
+];  */
 
 
 const ProductGallery = () => {
-  const { categories, loading } = useCategories();
+  const { categories, loading: loadingCategorias } = useCategories();
   const { addToCart, isInCart } = useCart();
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [products] = useState(productsData);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  //data
+  useEffect(() => {
+    const fetchPublicaciones = async () => {
+      try {
+        setLoading(true);
+        // 🔹 Llamada a tu API
+        const response = await api.get("/producto");
+
+       // 🔹 Extraer solo el array de publicaciones
+        setProducts(response.data.publicaciones);
+      } catch (err) {
+        console.error(err);
+        //setError("Error al cargar las publicaciones");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPublicaciones();
+  }, []);
+
+  /* useEffect(()=>{
+    console.log("producot",products)
+  },[products]) */
 
   // Filtrar productos por categoría
   const filteredProducts =
     selectedCategory === "all"
       ? products
-      : products.filter((product) => product.category === selectedCategory);
+      : products.filter((product) => product.categoria_id === selectedCategory);
 
   return (
     <div className="min-h-screen bg-base-200 p-6">
@@ -123,7 +150,7 @@ const ProductGallery = () => {
                         ? "btn-primary"
                         : "btn-ghost"
                     }`}
-                    onClick={() => setSelectedCategory(category.nombre)}
+                    onClick={() => setSelectedCategory(category.id)}
                   >
                     {category.nombre}
                   </button>
@@ -135,7 +162,7 @@ const ProductGallery = () => {
                 <p className="font-semibold">Filtro activo:</p>
                 <p className="text-lg">
                   {
-                    categories.find((cat) => cat.nombre === selectedCategory)
+                    categories.find((cat) => cat.id === selectedCategory)
                       ?.nombre
                   }
                 </p>
@@ -169,18 +196,18 @@ const ProductGallery = () => {
                   >
                     <figure className="px-4 pt-4">
                       <img
-                        src={product.image}
-                        alt={product.name}
+                        src={product.url_imagen}
+                        alt={product.titulo}
                         className="rounded-xl h-48 w-full object-cover"
                       />
                     </figure>
                     <div className="card-body">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="card-title text-lg">{product.name}</h3>
+                        <h3 className="card-title text-lg">{product.titulo}</h3>
                         <div className="badge badge-secondary">
                           {
                             categories.find(
-                              (cat) => cat.nombre === product.category
+                              (cat) => cat.id === product.categoria_id
                             )?.nombre
                           }
                         </div>
@@ -190,7 +217,7 @@ const ProductGallery = () => {
                       </p>
                       <div className="card-actions justify-between items-center">
                         <span className="text-2xl font-bold text-primary">
-                          ${product.price}
+                          ${product.precio}
                         </span>
                         <button
                           className="btn btn-primary btn-sm"

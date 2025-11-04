@@ -1,12 +1,9 @@
 import { useCart } from "../src/context/CartContext";
 
 const ShoppingCart = () => {
-  const {  cartItems,  removeFromCart, clearCart } = useCart();
+  const { cartItems, removeFromCart, clearCart } = useCart();
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const subtotal = cartItems.reduce((sum, item) => sum + item.precio, 0);
   const shipping = 5.99;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
@@ -32,7 +29,10 @@ const ShoppingCart = () => {
                 <h2 className="text-xl font-semibold">
                   Productos en el carrito ({cartItems.length})
                 </h2>
-                <button className="btn btn-ghost btn-sm text-error" onClick={() => clearCart()}>
+                <button
+                  className="btn btn-ghost btn-sm text-error"
+                  onClick={() => clearCart()}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 mr-1"
@@ -59,8 +59,8 @@ const ShoppingCart = () => {
                   >
                     <figure className="w-32 h-32 p-2">
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item.url_imagen}
+                        alt={item.titulo}
                         className="w-full h-full object-cover rounded-lg"
                       />
                     </figure>
@@ -68,13 +68,16 @@ const ShoppingCart = () => {
                     <div className="card-body flex-1 p-4">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <h3 className="card-title text-lg">{item.name}</h3>
+                          <h3 className="card-title text-lg">{item.titulo}</h3>
                           <p className="text-lg font-bold text-primary mt-2">
-                            ${item.price.toFixed(2)}
+                            ${item.precio.toFixed(2)}
                           </p>
                         </div>
 
-                        <button className="btn btn-ghost btn-sm btn-circle text-error" onClick={() => removeFromCart(item.id)}>
+                        <button
+                          className="btn btn-ghost btn-sm btn-circle text-error"
+                          onClick={() => removeFromCart(item.id)}
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4"
@@ -105,11 +108,7 @@ const ShoppingCart = () => {
 
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
-                  <span>
-                    Subtotal (
-                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}{" "}
-                    productos)
-                  </span>
+                  <span>Subtotal ({cartItems.length} productos)</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">

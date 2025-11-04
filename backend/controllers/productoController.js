@@ -36,7 +36,6 @@ export async function addProducto(req, res) {
 export async function borrarProducto(req, res) {
   try {
     const { id: productoId } = req.params;
-    console.log(productoId);
     await borrar(productoId);
     res.status(204).send();
   } catch (error) {
