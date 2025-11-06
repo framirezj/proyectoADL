@@ -392,8 +392,7 @@ export default function ProductoForm() {
                 >
                   {loading ? (
                     <>
-                      <span className="loading loading-spinner"></span>
-                      Publicando...
+                      <span className="loading loading-spinner text-primary"></span>
                     </>
                   ) : (
                     <>
