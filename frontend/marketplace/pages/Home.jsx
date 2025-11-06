@@ -119,9 +119,9 @@ export default function Home() {
             <div className="py-12 bg-base-100">
                 <div className="w-11/12 lg:w-4/5 mx-auto">
                     <div className="text-center mb-12">
-                        <h3 className="text-4xl font-bold mb-4 text-primary">Productos Destacados</h3>
+                        <h3 className="text-4xl font-bold mb-4 text-primary">Explora Nuestras Publicaciones</h3>
                         <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
-                            Descubre nuestra selección de productos más populares y mejor valorados
+                            Una muestra de lo disponible en nuestro marketplace
                         </p>
                     </div>
                     

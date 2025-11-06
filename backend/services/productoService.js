@@ -2,7 +2,8 @@ import {
   deleteProducto,
   insertProducto,
   selectProductos,
-  selectProducto
+  selectProducto,
+  selectPublicacionesRandom as selectRandom,
 } from "../models/productoModel.js";
 
 export async function crearProducto(data) {
@@ -49,8 +50,18 @@ export async function obtenerPublicacion(productoId, baseUrl) {
 
   return {
     ...result,
-    imagen: `${baseUrl}/uploads/${result.url_imagen}`
-  }
-
+    imagen: `${baseUrl}/uploads/${result.url_imagen}`,
   };
+}
 
+export async function obtenerPublicacionesRandom(baseUrl) {
+  const publicaciones = await selectRandom();
+  return {
+    publicaciones: publicaciones.map((producto) => ({
+      ...producto,
+      imagen: producto.url_imagen
+        ? `${baseUrl}/uploads/${producto.url_imagen}`
+        : null,
+    })),
+  };
+}
