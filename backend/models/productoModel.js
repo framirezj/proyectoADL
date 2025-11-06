@@ -56,3 +56,14 @@ export async function selectProducto(productoId){
 
   return rows[0]
 }
+
+export async function selectPublicacionesRandom() {
+  const query = `
+    SELECT * FROM publicaciones 
+    ORDER BY RANDOM() 
+    LIMIT 9;
+  `;
+  const { rows } = await pool.query(query);
+
+  return rows;
+}

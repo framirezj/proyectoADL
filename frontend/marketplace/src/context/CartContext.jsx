@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { showSuccess } from '../../util/toast';
 
 const CartContext = createContext();
 
@@ -35,6 +36,7 @@ export const CartProvider = ({ children }) => {
         return [...prevItems, { ...product, quantity: 1 }];
       }
     });
+    showSuccess("Producto agregado al carrito")
   };
 
   // Eliminar producto del carrito
