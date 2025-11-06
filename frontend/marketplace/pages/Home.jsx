@@ -16,123 +16,130 @@ export default function Home() {
     navigate(`/detalle/${productId}`);
   };
 
-  // Datos de prueba para productos destacados
-  /*   const featuredProducts = [
-    {
-      id: 1,
-      name: "Zapatillas Deportivas Pro",
-      price: 89.99,
-      image:
-        "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp",
-      description:
-        "Zapatillas ideales para running y entrenamiento con máxima comodidad",
-      category: "Deportes",
-      rating: 4.5,
-    },
-    {
-      id: 2,
-      name: "Smartphone Ultra X",
-      price: 699.99,
-      image:
-        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400",
-      description:
-        "Teléfono inteligente con cámara de 108MP y batería de larga duración",
-      category: "Electrónicos",
-      rating: 4.8,
-    },
-    {
-      id: 3,
-      name: "Auriculares Bluetooth",
-      price: 129.99,
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
-      description: "Sonido premium con cancelación de ruido activa",
-      category: "Electrónicos",
-      rating: 4.3,
-    },
-    {
-      id: 4,
-      name: "Camiseta Premium",
-      price: 29.99,
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
-      description: "Camiseta de algodón orgánico, perfecta para el día a día",
-      category: "Ropa",
-      rating: 4.6,
-    },
-    {
-      id: 5,
-      name: "Reloj Inteligente",
-      price: 199.99,
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
-      description: "Monitoriza tu salud y mantente conectado",
-      category: "Electrónicos",
-      rating: 4.4,
-    },
-    {
-      id: 6,
-      name: "Mochila Urbana",
-      price: 49.99,
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
-      description: "Diseño moderno con múltiples compartimentos",
-      category: "Accesorios",
-      rating: 4.7,
-    },
-    {
-      id: 7,
-      name: "Cafetera Express",
-      price: 159.99,
-      image:
-        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
-      description: "Prepara el café perfecto en segundos",
-      category: "Hogar",
-      rating: 4.9,
-    },
-    {
-      id: 8,
-      name: "Libro Best Seller",
-      price: 24.99,
-      image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
-      description: "La novela más vendida del año, edición especial",
-      category: "Libros",
-      rating: 4.8,
-    },
-    {
-      id: 9,
-      name: "Gafas de Sol Elite",
-      price: 79.99,
-      image:
-        "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400",
-      description: "Protección UV400 con estilo contemporáneo",
-      category: "Accesorios",
-      rating: 4.5,
-    },
-  ]; */
+  const fetchPublicaciones = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const response = await api.get("/producto/random");
+
+      // 🔹 Asegurar que siempre sea un array
+      const publicacionesData = response.data.publicaciones || [];
+      setPublicaciones(publicacionesData);
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Error al cargar las publicaciones. Por favor, intenta nuevamente."
+      );
+      // 🔹 Asegurar que publicaciones sea array vacío en caso de error
+      setPublicaciones([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPublicaciones = async () => {
-      try {
-        setLoading(true);
-
-        // 🔹 Delay fijo de 1.5 segundos antes de hacer la petición
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        // 🔹 Llamada a tu API
-        const response = await api.get("/producto/random");
-
-        // 🔹 Extraer solo el array de publicaciones
-        setPublicaciones(response.data.publicaciones);
-      } catch (err) {
-        console.error(err);
-        setError("Error al cargar las publicaciones");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPublicaciones();
   }, []);
+
+  // 🔹 Renderizado condicional mejorado
+  const renderContent = () => {
+    if (loading) {
+      return <Spinner />;
+    }
+
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="alert alert-error max-w-md mb-4">
+            <span>{error}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // 🔹 Verificación más robusta
+    if (
+      !publicaciones ||
+      !Array.isArray(publicaciones) ||
+      publicaciones.length === 0
+    ) {
+      return (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">😔</div>
+          <h3 className="text-2xl font-semibold text-error">
+            No hay productos
+          </h3>
+        </div>
+      );
+    }
+
+    // 🔹 Renderizado exitoso
+    return (
+      <>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {publicaciones.map((product) => (
+            <div
+              key={product.id}
+              className="card bg-base-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+              onClick={() => handleDetails(product.id)}
+            >
+              <figure className="relative overflow-hidden">
+                <img
+                  src={product.imagen}
+                  alt={product.titulo || "Producto sin título"}
+                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute top-4 right-4">
+                  <div className="badge badge-primary badge-lg font-semibold">
+                    ${product.precio || "0"}
+                  </div>
+                </div>
+                <div className="absolute top-4 left-4">
+                  <div className="badge badge-secondary badge-outline">
+                    {categories.find((cat) => cat.id === product.categoria_id)
+                      ?.nombre || "Sin categoría"}
+                  </div>
+                </div>
+              </figure>
+              <div className="card-body p-6">
+                <div className="flex justify-between items-start mb-2">
+                  <h2 className="card-title text-xl font-bold group-hover:text-primary transition-colors">
+                    {product.titulo || "Producto sin título"}
+                  </h2>
+                </div>
+                <p className="text-base-content/70 mb-4 line-clamp-2">
+                  {product.descripcion || "Sin descripción disponible"}
+                </p>
+                <div className="card-actions justify-between items-center">
+                  <button
+                    className="btn btn-ghost btn-sm text-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDetails(product.id);
+                    }}
+                  >
+                    Ver detalles →
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <button
+            className="btn btn-outline btn-primary btn-wide"
+            onClick={() => navigate("/catalogo")}
+          >
+            Ver Todos los Productos
+          </button>
+        </div>
+      </>
+    );
+  };
 
   return (
     <div>
@@ -174,77 +181,10 @@ export default function Home() {
             </p>
           </div>
 
-          {/* contenedor de cards */}
-          {loading ? (
-            <Spinner />
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {publicaciones.map((product) => (
-                <div
-                  key={product.id}
-                  className="card bg-base-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group"
-                  onClick={() => handleDetails(product.id)}
-                >
-                  <figure className="relative overflow-hidden">
-                    <img
-                      src={product.imagen}
-                      alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 right-4">
-                      <div className="badge badge-primary badge-lg font-semibold">
-                        ${product.precio}
-                      </div>
-                    </div>
-                    <div className="absolute top-4 left-4">
-                      <div className="badge badge-secondary badge-outline">
-                        {
-                          categories.find(
-                            (cat) => cat.id === product.categoria_id
-                          )?.nombre
-                        }
-                      </div>
-                    </div>
-                  </figure>
-                  <div className="card-body p-6">
-                    <div className="flex justify-between items-start mb-2">
-                      <h2 className="card-title text-xl font-bold group-hover:text-primary transition-colors">
-                        {product.titulo}
-                      </h2>
-                    </div>
-                    <p className="text-base-content/70 mb-4 line-clamp-2">
-                      {product.descripcion}
-                    </p>
-                    <div className="card-actions justify-between items-center">
-                      <button
-                        className="btn btn-ghost btn-sm text-primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDetails(product.id);
-                        }}
-                      >
-                        Ver detalles →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Botón para ver más productos */}
-          <div className="text-center mt-12">
-            <button
-              className="btn btn-outline btn-primary btn-wide"
-              onClick={() => navigate("/catalogo")}
-            >
-              Ver Todos los Productos
-            </button>
-          </div>
+          {renderContent()}
         </div>
       </div>
 
-      {/* sección de características/footer */}
       <Footer />
     </div>
   );
