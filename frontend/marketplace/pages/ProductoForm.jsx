@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCategories } from "../src/context/CategoriaContext.jsx";
-import api from '../src/api/axiosConfig.js'
+import api from "../src/api/axiosConfig.js";
+import Spinner from "../components/Spinner.jsx";
+import { showSuccess } from "../util/toast.js";
 
 export default function ProductoForm() {
   // Estados
@@ -18,44 +20,38 @@ export default function ProductoForm() {
   const [previewImage, setPreviewImage] = useState("");
   const navigate = useNavigate();
 
-  // categorias
   const {
     categories,
     loading: categoriesLoading,
     error: categoriesError,
   } = useCategories();
 
-  // Metodos
+  const safeCategories = Array.isArray(categories) ? categories : [];
+
+  // Manejar cambios de input
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
     if (type === "file") {
       const file = files[0];
-      setFormData((prevState) => ({
-        ...prevState,
-        [name]: file,
-      }));
+      setFormData((prevState) => ({ ...prevState, [name]: file }));
 
-      // Crear preview de la imagen
+      // Crear preview
       if (file) {
         const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewImage(reader.result);
-        };
+        reader.onloadend = () => setPreviewImage(reader.result);
         reader.readAsDataURL(file);
       } else {
         setPreviewImage("");
       }
     } else {
-      setFormData((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
+      setFormData((prevState) => ({ ...prevState, [name]: value }));
     }
 
     if (error) setError("");
   };
 
+  // Enviar formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -67,25 +63,21 @@ export default function ProductoForm() {
       setLoading(false);
       return;
     }
-
     if (!formData.categoria) {
       setError("Debes seleccionar una categoría");
       setLoading(false);
       return;
     }
-
     if (!formData.precio || parseFloat(formData.precio) <= 0) {
       setError("El precio debe ser mayor a 0");
       setLoading(false);
       return;
     }
-
     if (!formData.descripcion.trim()) {
       setError("La descripción del producto es requerida");
       setLoading(false);
       return;
     }
-
     if (!formData.condicion) {
       setError("Debes seleccionar la condición del producto");
       setLoading(false);
@@ -93,36 +85,29 @@ export default function ProductoForm() {
     }
 
     try {
-      // Crear FormData para enviar archivos
       const submitData = new FormData();
       submitData.append("titulo", formData.titulo);
       submitData.append("categoria", formData.categoria);
       submitData.append("precio", parseFloat(formData.precio));
       submitData.append("descripcion", formData.descripcion);
       submitData.append("condicion", formData.condicion);
-
-      if (formData.imagen) {
-        submitData.append("imagen", formData.imagen);
-      }
+      if (formData.imagen) submitData.append("imagen", formData.imagen);
 
       const response = await api.post("/producto/nuevo", submitData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (response.status === 201) {
-        alert("Producto publicado exitosamente!");
+        showSuccess("Producto publicado exitosamente!")
         navigate("/mispublicaciones");
       }
 
+      
     } catch (error) {
       console.error("Error al publicar producto:", error);
 
       if (error.response) {
-        setError(
-          error.response.data.message || "Error al publicar el producto"
-        );
+        setError(error.response.data.message || "Error al publicar el producto");
       } else if (error.request) {
         setError("Error de conexión con el servidor");
       } else {
@@ -130,13 +115,16 @@ export default function ProductoForm() {
       }
     } finally {
       setLoading(false);
-    } 
+    }
   };
 
+  // ==========================
+  // Render
+  // ==========================
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        {/* Header Mejorado */}
+        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-base-content mb-3">
             Publicar Nuevo Producto
@@ -169,7 +157,7 @@ export default function ProductoForm() {
 
           <form onSubmit={handleSubmit}>
             <fieldset className="space-y-6" disabled={loading}>
-              {/* Título del Producto */}
+              {/* Título */}
               <div className="form-control">
                 <label className="label">
                   <span className="label-text text-lg font-semibold">
@@ -187,7 +175,7 @@ export default function ProductoForm() {
                 />
               </div>
 
-              {/* Categoría y Precio en fila */}
+              {/* Categoría y Precio */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Categoría */}
                 <div className="form-control">
@@ -195,31 +183,32 @@ export default function ProductoForm() {
                     <span className="label-text text-lg font-semibold">
                       Categoría
                     </span>
-                    {categoriesLoading && (
-                      <span className="loading loading-spinner loading-xs ml-2"></span>
-                    )}
                   </label>
-                  <select
-                    name="categoria"
-                    className="select select-bordered select-lg w-full focus:select-primary"
-                    value={formData.categoria}
-                    onChange={handleChange}
-                    required
-                    disabled={categoriesLoading}
-                  >
-                    <option value="">Selecciona una categoría</option>
-                    {categories.map((categoria) => (
-                      <option key={categoria.id} value={categoria.id}>
-                        {categoria.nombre}
-                      </option>
-                    ))}
-                  </select>
-                  {categoriesLoading && (
-                    <label className="label">
-                      <span className="label-text-alt text-primary">
-                        Cargando categorías...
-                      </span>
-                    </label>
+                  {categoriesLoading ? (
+                    <Spinner />
+                  ) : categoriesError ? (
+                    <p className="text-sm text-error">
+                      Error al cargar categorías
+                    </p>
+                  ) : safeCategories.length > 0 ? (
+                    <select
+                      name="categoria"
+                      className="select select-bordered select-lg w-full focus:select-primary"
+                      value={formData.categoria}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Selecciona una categoría</option>
+                      {safeCategories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.nombre}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="text-sm text-base-content/60">
+                      No hay categorías disponibles
+                    </p>
                   )}
                 </div>
 
@@ -259,14 +248,14 @@ export default function ProductoForm() {
                 <textarea
                   name="descripcion"
                   className="textarea textarea-bordered w-full h-32 textarea-lg focus:textarea-primary"
-                  placeholder="Describe tu producto en detalle: características, estado, accesorios incluidos, etc."
+                  placeholder="Describe tu producto en detalle..."
                   value={formData.descripcion}
                   onChange={handleChange}
                   required
                 ></textarea>
               </div>
 
-              {/* Imagen del Producto */}
+              {/* Imagen */}
               <div className="form-control">
                 <label className="label">
                   <span className="label-text text-lg font-semibold">
@@ -285,7 +274,6 @@ export default function ProductoForm() {
                     Formatos: JPG, PNG, GIF • Máximo 5MB
                   </p>
 
-                  {/* Preview de la imagen */}
                   {previewImage && (
                     <div className="mt-4">
                       <p className="text-sm font-semibold mb-2">
@@ -311,56 +299,40 @@ export default function ProductoForm() {
                   </span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label
-                    className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                      formData.condicion === "nuevo"
-                        ? "border-primary bg-primary/10"
-                        : "border-base-300 hover:border-primary/50"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="condicion"
-                      className="radio radio-primary mr-3"
-                      value="nuevo"
-                      checked={formData.condicion === "nuevo"}
-                      onChange={handleChange}
-                      required
-                    />
-                    <div>
-                      <span className="font-semibold text-lg">Nuevo</span>
-                      <p className="text-sm text-base-content/60">
-                        Producto sin uso, en empaque original
-                      </p>
-                    </div>
-                  </label>
-
-                  <label
-                    className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                      formData.condicion === "usado"
-                        ? "border-primary bg-primary/10"
-                        : "border-base-300 hover:border-primary/50"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="condicion"
-                      className="radio radio-primary mr-3"
-                      value="usado"
-                      checked={formData.condicion === "usado"}
-                      onChange={handleChange}
-                    />
-                    <div>
-                      <span className="font-semibold text-lg">Usado</span>
-                      <p className="text-sm text-base-content/60">
-                        Producto en buen estado, con señales de uso
-                      </p>
-                    </div>
-                  </label>
+                  {["nuevo", "usado"].map((cond) => (
+                    <label
+                      key={cond}
+                      className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                        formData.condicion === cond
+                          ? "border-primary bg-primary/10"
+                          : "border-base-300 hover:border-primary/50"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="condicion"
+                        className="radio radio-primary mr-3"
+                        value={cond}
+                        checked={formData.condicion === cond}
+                        onChange={handleChange}
+                        required
+                      />
+                      <div>
+                        <span className="font-semibold text-lg capitalize">
+                          {cond}
+                        </span>
+                        <p className="text-sm text-base-content/60">
+                          {cond === "nuevo"
+                            ? "Producto sin uso, en empaque original"
+                            : "Producto en buen estado, con señales de uso"}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
                 </div>
               </div>
 
-              {/* Botones de Acción */}
+              {/* Botones */}
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
                 <button
                   type="button"
@@ -368,21 +340,7 @@ export default function ProductoForm() {
                   className="btn btn-outline btn-lg flex-1 gap-2"
                   disabled={loading}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                    />
-                  </svg>
-                  Cancelar
+                  ← Cancelar
                 </button>
 
                 <button
@@ -391,28 +349,9 @@ export default function ProductoForm() {
                   disabled={loading}
                 >
                   {loading ? (
-                    <>
-                      <span className="loading loading-spinner"></span>
-                      Publicando...
-                    </>
+                    <span className="loading loading-spinner text-primary"></span>
                   ) : (
-                    <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 10V3L4 14h7v7l9-11h-7z"
-                        />
-                      </svg>
-                      Publicar Producto
-                    </>
+                    "Publicar Producto"
                   )}
                 </button>
               </div>

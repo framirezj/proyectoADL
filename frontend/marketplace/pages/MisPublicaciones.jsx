@@ -1,70 +1,25 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../src/api/axiosConfig";
+import Spinner from "../components/Spinner";
 
 export default function MisPublicaciones() {
   const [publicaciones, setPublicaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Datos de ejemplo para las publicaciones
-  /* const publicaciones = [
-    {
-      id: 1,
-      titulo: "iPhone 13 Pro",
-      categoria: "Telefonía",
-      condicion: "nuevo",
-      precio: 899,
-      imagen: "📱",
-      colorGradiente: "from-blue-400 to-blue-600",
-      vistas: 124,
-      favoritos: 8,
-      fecha: "2024-01-15",
-    },
-    {
-      id: 2,
-      titulo: "MacBook Air M2",
-      categoria: "Computación",
-      condicion: "usado",
-      precio: 1199,
-      imagen: "💻",
-      colorGradiente: "from-green-400 to-green-600",
-      vistas: 89,
-      favoritos: 12,
-      fecha: "2024-01-10",
-    },
-  ]; */
-
-  useEffect(() => {
-    const fetchPublicaciones = async () => {
-      try {
-        setLoading(true);
-        // 🔹 Llamada a tu API
-        const response = await api.get("/usuarios/publicaciones");
-        // 🔹 Extraer solo el array de publicaciones
-        setPublicaciones(response.data.publicaciones);
-      } catch (err) {
-        console.error(err);
-        setError("Error al cargar las publicaciones");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPublicaciones();
-  }, []);
-
   const handleDelete = async (productoId) => {
     try {
       await api.delete(`/producto/${productoId}`);
 
       // actulizar la lista
-      setPublicaciones((prevPublicaciones) => prevPublicaciones.filter((item) => item.id !== productoId))
-
+      setPublicaciones((prevPublicaciones) =>
+        prevPublicaciones.filter((item) => item.id !== productoId)
+      );
     } catch (error) {
-      console.error('Error eliminando producto:', error);
+      console.error("Error eliminando producto:", error);
     }
-  }
+  };
 
   const getEstadoBadge = (condicion) => {
     const config = {
@@ -80,7 +35,139 @@ export default function MisPublicaciones() {
     );
   };
 
-  if (loading) return <p>Cargando publicaciones...</p>;
+  const renderContent = () => {
+    if (loading) {
+      return <Spinner />;
+    }
+
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="alert alert-error max-w-md mb-4">
+            <span>{error}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // 🔹 Verificación más robusta
+    if (
+      !publicaciones ||
+      !Array.isArray(publicaciones) ||
+      publicaciones.length === 0
+    ) {
+      return (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">😔</div>
+          <h3 className="text-2xl font-semibold text-error">
+            No hay productos
+          </h3>
+        </div>
+      );
+    }
+
+    // 🔹 Renderizado exitoso
+    return (
+      <div className="space-y-4">
+        {publicaciones.map((publicacion) => (
+          <div
+            key={publicacion.id}
+            className="bg-base-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div className="p-6">
+              <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                {/* Imagen del producto */}
+                <div className="flex-shrink-0">
+                  {publicacion.imagen ? (
+                    <img
+                      src={publicacion.imagen}
+                      alt={publicacion.titulo}
+                      className="w-24 h-24 object-cover rounded-2xl shadow-lg"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-2xl bg-base-300 flex items-center justify-center text-gray-400">
+                      Sin imagen
+                    </div>
+                  )}
+                </div>
+
+                {/* Información principal */}
+                <div className="flex-grow">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
+                    <div>
+                      <h3 className="text-xl font-bold text-base-content mb-1">
+                        {publicacion.titulo}
+                      </h3>
+                      <div className="flex items-center space-x-4 mb-2">
+                        <span className="text-base-content/70 text-sm">
+                          {publicacion.categoria}
+                        </span>
+                        {getEstadoBadge(publicacion.estado)}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 lg:mt-0 lg:text-right">
+                      <div className="text-3xl font-bold text-primary mb-2">
+                        ${publicacion.precio}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Acciones */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        className="btn btn-outline btn-error btn-sm gap-2"
+                        onClick={() => handleDelete(publicacion.id)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    const fetchPublicaciones = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        // 🔹 Llamada a tu API
+        const response = await api.get("/usuarios/publicaciones");
+        // 🔹 Extraer solo el array de publicaciones
+        setPublicaciones(response.data.publicaciones || []);
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar las publicaciones");
+        setPublicaciones([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPublicaciones();
+  }, []);
 
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
@@ -131,79 +218,7 @@ export default function MisPublicaciones() {
         </div>
 
         {/* Lista de publicaciones */}
-        <div className="space-y-4">
-          {publicaciones.map((publicacion) => (
-            <div
-              key={publicacion.id}
-              className="bg-base-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <div className="p-6">
-                <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                  {/* Imagen del producto */}
-                  <div className="flex-shrink-0">
-                    {publicacion.imagen ? (
-                      <img
-                        src={publicacion.imagen}
-                        alt={publicacion.titulo}
-                        className="w-24 h-24 object-cover rounded-2xl shadow-lg"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 rounded-2xl bg-base-300 flex items-center justify-center text-gray-400">
-                        Sin imagen
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Información principal */}
-                  <div className="flex-grow">
-                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
-                      <div>
-                        <h3 className="text-xl font-bold text-base-content mb-1">
-                          {publicacion.titulo}
-                        </h3>
-                        <div className="flex items-center space-x-4 mb-2">
-                          <span className="text-base-content/70 text-sm">
-                            {publicacion.categoria}
-                          </span>
-                          {getEstadoBadge(publicacion.estado)}
-                        </div>
-                      </div>
-
-                      <div className="mt-4 lg:mt-0 lg:text-right">
-                        <div className="text-3xl font-bold text-primary mb-2">
-                          ${publicacion.precio}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Acciones */}
-                    <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
-                      <div className="flex flex-wrap gap-2">
-                        <button className="btn btn-outline btn-error btn-sm gap-2" onClick={() => handleDelete(publicacion.id)}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                          Eliminar
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {renderContent()}
 
         {/* Paginación */}
       </div>
