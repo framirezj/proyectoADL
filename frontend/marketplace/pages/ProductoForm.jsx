@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCategories } from "../src/context/CategoriaContext.jsx";
 import api from "../src/api/axiosConfig.js";
 import Spinner from "../components/Spinner.jsx";
+import { showSuccess } from "../util/toast.js";
 
 export default function ProductoForm() {
   // Estados
@@ -97,9 +98,11 @@ export default function ProductoForm() {
       });
 
       if (response.status === 201) {
-        alert("Producto publicado exitosamente!");
+        showSuccess("Producto publicado exitosamente!")
         navigate("/mispublicaciones");
       }
+
+      
     } catch (error) {
       console.error("Error al publicar producto:", error);
 
