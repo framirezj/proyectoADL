@@ -4,7 +4,7 @@ import {
   borrarProducto as borrar,
   obtenerPublicaciones as obtener,
   obtenerPublicacion as obtenerById,
-  obtenerPublicacionesRandom as obtenerRandom
+  obtenerPublicacionesRandom as obtenerRandom,
 } from "../services/productoService.js";
 
 export async function addProducto(req, res) {
@@ -49,9 +49,23 @@ export async function borrarProducto(req, res) {
 }
 
 export async function obtenerPublicaciones(req, res) {
+  const { limit, order, page = 1 } = req.query;
+  // Utilizar una expresión regular para verificar si 'page' es un número válido
+  const isPageValid = /^[1-9]\d*$/.test(page);
+
+  // Validar el resultado de la expresión regular
+  if (!isPageValid) {
+    return res
+      .status(400)
+      .json({ message: "Número de Página inválido, page > 0" });
+  }
+
   try {
     const baseUrl = `${req.protocol}://${req.get("host")}`;
-    res.status(200).json(await obtener(baseUrl));
+
+    const response = await obtener(baseUrl, { limit, order, page });
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Error al obtener los registros:", error.message);
     res
@@ -62,10 +76,9 @@ export async function obtenerPublicaciones(req, res) {
 
 export async function obtenerPublicacion(req, res) {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const { id: productoId } = req.params
+  const { id: productoId } = req.params;
   res.status(200).json(await obtenerById(productoId, baseUrl));
 }
-
 
 export async function obtenerPublicacionesRandom(req, res) {
   try {

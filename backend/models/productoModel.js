@@ -37,16 +37,32 @@ export async function deleteProducto(productoId) {
   const result = await pool.query(query, values);
 }
 
-export async function selectProductos() {
-  const query = `
-    SELECT * FROM publicaciones;
-  `;
-  const { rows } = await pool.query(query);
+export async function selectProductos({ limit = 9, order = "ASC", page = 1 }) {
+  // Consulta para contar el número total de filas en la tabla 'todos'
+  const { rows: countResult } = await pool.query(
+    "SELECT COUNT(*) FROM publicaciones"
+  );
+  const total_rows = parseInt(countResult[0].count, 10);
 
-  return rows;
+  // Calcula el número total de páginas
+  const total_pages = Math.ceil(total_rows / limit);
+
+  const query = `
+    SELECT * FROM publicaciones LIMIT $1 OFFSET $2;
+  `;
+
+  const offset = (page - 1) * limit;
+  const { rows: publicaciones } = await pool.query(query, [limit, offset]);
+
+  return {
+    publicaciones,
+    total_pages,
+    page,
+    limit,
+  }
 }
 
-export async function selectProducto(productoId){
+export async function selectProducto(productoId) {
   const query = `
     SELECT * FROM publicaciones WHERE id = $1;
   `;
@@ -54,7 +70,7 @@ export async function selectProducto(productoId){
 
   const { rows } = await pool.query(query, values);
 
-  return rows[0]
+  return rows[0];
 }
 
 export async function selectPublicacionesRandom() {
