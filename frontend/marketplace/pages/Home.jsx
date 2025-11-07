@@ -21,7 +21,7 @@ export default function Home() {
       setLoading(true);
       setError(null);
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       const response = await api.get("/producto/random");
 

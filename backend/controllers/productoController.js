@@ -49,7 +49,7 @@ export async function borrarProducto(req, res) {
 }
 
 export async function obtenerPublicaciones(req, res) {
-  const { limit, order, page = 1 } = req.query;
+  const { limit, order, page = 1, categoria } = req.query;
   // Utilizar una expresión regular para verificar si 'page' es un número válido
   const isPageValid = /^[1-9]\d*$/.test(page);
 
@@ -63,7 +63,7 @@ export async function obtenerPublicaciones(req, res) {
   try {
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
-    const response = await obtener(baseUrl, { limit, order, page });
+    const response = await obtener(baseUrl, { limit, order, page, categoria });
 
     res.status(200).json(response);
   } catch (error) {

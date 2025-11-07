@@ -35,9 +35,9 @@ export async function borrarProducto(productoId) {
 
 export async function obtenerPublicaciones(
   baseUrl,
-  { limit, order, page}
+  { limit, order, page, categoria}
 ) {
-  const result = await selectProductos({ limit, order, page });
+  const result = await selectProductos({ limit, order, page, categoria });
   return {
     total_pages: result.total_pages,
     limit: result.limit,

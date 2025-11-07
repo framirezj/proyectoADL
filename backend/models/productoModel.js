@@ -37,29 +37,57 @@ export async function deleteProducto(productoId) {
   const result = await pool.query(query, values);
 }
 
-export async function selectProductos({ limit = 9, order = "ASC", page = 1 }) {
-  // Consulta para contar el número total de filas en la tabla 'todos'
-  const { rows: countResult } = await pool.query(
-    "SELECT COUNT(*) FROM publicaciones"
-  );
-  const total_rows = parseInt(countResult[0].count, 10);
+export async function selectProductos({
+  limit = 9,
+  order = "ASC",
+  page = 1,
+  categoria = 0,
+}) {
+  
 
-  // Calcula el número total de páginas
-  const total_pages = Math.ceil(total_rows / limit);
-
-  const query = `
-    SELECT * FROM publicaciones LIMIT $1 OFFSET $2;
-  `;
+  limit = Number(limit) || 9;
+  page = Number(page) || 1;
+  categoria = Number(categoria) || 0;
 
   const offset = (page - 1) * limit;
-  const { rows: publicaciones } = await pool.query(query, [limit, offset]);
+
+  // Base query y parámetros dinámicos
+  let whereClause = "";
+  const params = [];
+
+  if (categoria !== 0) {
+    whereClause = "WHERE categoria_id = $1";
+    params.push(categoria);
+  }
+
+  // 🔢 1. Contar total de registros (filtrados o no)
+  const countQuery = `SELECT COUNT(*) FROM publicaciones ${whereClause}`;
+  const { rows: countResult } = await pool.query(countQuery, params);
+  const total_rows = parseInt(countResult[0].count, 10);
+  const total_pages = Math.ceil(total_rows / limit);
+
+  // 📦 2. Traer publicaciones según paginación
+  // armamos los parámetros según si hay filtro o no
+  const queryParams =
+    categoria !== 0 ? [...params, limit, offset] : [limit, offset];
+
+  const query = `
+    SELECT *
+    FROM publicaciones
+    ${whereClause}
+    ORDER BY id ${order}
+    LIMIT $${queryParams.length - 1}
+    OFFSET $${queryParams.length};
+  `;
+
+  const { rows: publicaciones } = await pool.query(query, queryParams);
 
   return {
     publicaciones,
     total_pages,
     page,
     limit,
-  }
+  };
 }
 
 export async function selectProducto(productoId) {
