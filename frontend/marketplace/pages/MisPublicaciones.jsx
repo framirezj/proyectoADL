@@ -152,7 +152,7 @@ export default function MisPublicaciones() {
       try {
         setLoading(true);
         setError(null);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         // 🔹 Llamada a tu API
         const response = await api.get("/usuarios/publicaciones");
         // 🔹 Extraer solo el array de publicaciones

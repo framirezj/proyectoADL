@@ -33,10 +33,18 @@ export async function borrarProducto(productoId) {
   return await deleteProducto(productoId);
 }
 
-export async function obtenerPublicaciones(baseUrl) {
-  const publicaciones = await selectProductos();
+export async function obtenerPublicaciones(
+  baseUrl,
+  { limit, order, page, categoria}
+) {
+  const result = await selectProductos({ limit, order, page, categoria });
   return {
-    publicaciones: publicaciones.map((producto) => ({
+    total_pages: result.total_pages,
+    limit: result.limit,
+    page: result.page,
+    next: result.total_pages <= result.page ? null : `${baseUrl}/api/producto?limit=${result.limit}&page=${Number(result.page)+1}`,
+    previous: result.page <= 1 ? null : `${baseUrl}/api/producto?limit=${result.limit}&page=${Number(result.page) - 1}`,
+    publicaciones: result.publicaciones.map((producto) => ({
       ...producto,
       imagen: producto.url_imagen
         ? `${baseUrl}/uploads/${producto.url_imagen}`

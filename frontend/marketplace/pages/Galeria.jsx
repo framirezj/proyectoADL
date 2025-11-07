@@ -8,23 +8,28 @@ import Spinner from "../components/Spinner";
 const ProductGallery = () => {
   const { categories, loading: loadingCategorias } = useCategories();
   const { addToCart, isInCart } = useCart();
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(0);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  /* paginas */
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(3);
+  const [totalPages, setTotalPages] = useState(0);
 
   const handleDetails = (productId) => {
     navigate(`/detalle/${productId}`);
   };
 
-  // Filtrar productos por categoría
+/*   // Filtrar productos por categoría
   const filteredProducts =
     selectedCategory === "all"
       ? products
-      : products.filter((product) => product.categoria_id === selectedCategory);
+      : products.filter((product) => product.categoria_id === selectedCategory); */
 
   
+
   const renderProducts = () => {
     if (loading || loadingCategorias) {
       return <Spinner />;
@@ -56,8 +61,9 @@ const ProductGallery = () => {
 
     return (
       <div className="lg:w-3/4">
+        {/* productos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
+          {products.map((product) => (
             <div
               key={product.id}
               className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
@@ -76,11 +82,9 @@ const ProductGallery = () => {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="card-title text-lg">{product.titulo}</h3>
                   <div className="badge badge-secondary">
-                    {
-                      safeCategories.find(
-                        (cat) => cat.id === product.categoria_id
-                      )?.nombre || "Sin categoría"
-                    }
+                    {safeCategories.find(
+                      (cat) => cat.id === product.categoria_id
+                    )?.nombre || "Sin categoría"}
                   </div>
                 </div>
                 <p className="text-base-content/70 text-sm mb-4">
@@ -104,20 +108,46 @@ const ProductGallery = () => {
             </div>
           ))}
         </div>
+        {/* paginas */}
+        <div className="flex justify-center mt-8">
+          <div className="join">
+            <button
+              className="join-item btn"
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+            >
+              «
+            </button>
+
+            <button className="join-item btn btn-ghost no-click">
+            Página {page} / {totalPages}
+          </button>
+
+            <button
+              className="join-item btn"
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              »
+            </button>
+          </div>
+        </div>
       </div>
     );
   };
 
-  
   useEffect(() => {
-    const fetchPublicaciones = async () => {
+    const fetchPublicaciones = async (page = 1, limit = 9, categoria) => {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        setError(null);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        const response = await api.get("/producto");
-        setProducts(response.data.publicaciones || []);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const response = await api.get(`/producto?limit=${limit}&page=${page}&categoria=${categoria}`);
+        const data = response.data;
+        setProducts(data.publicaciones || []);
+        setTotalPages(Number(data.total_pages));
+        setLimit(Number(data.limit));
+        setPage(Number(data.page));
       } catch (err) {
         console.error(err);
         setError("Error al cargar las publicaciones");
@@ -127,10 +157,13 @@ const ProductGallery = () => {
       }
     };
 
-    fetchPublicaciones();
-  }, []);
+    fetchPublicaciones(page, limit, selectedCategory);
+  }, [page, selectedCategory]);
 
-  
+
+
+
+
   const safeCategories = Array.isArray(categories) ? categories : [];
 
   return (
@@ -154,9 +187,9 @@ const ProductGallery = () => {
                 <div className="space-y-2">
                   <button
                     className={`btn btn-block justify-start ${
-                      selectedCategory === "all" ? "btn-primary" : "btn-ghost"
+                      selectedCategory === 0 ? "btn-primary" : "btn-ghost"
                     }`}
-                    onClick={() => setSelectedCategory("all")}
+                    onClick={() => setSelectedCategory(0)}
                   >
                     Todos
                   </button>
@@ -185,16 +218,13 @@ const ProductGallery = () => {
               <div className="mt-6 p-4 bg-info text-info-content rounded-lg">
                 <p className="font-semibold">Filtro activo:</p>
                 <p className="text-lg">
-                  {
-                    safeCategories.find(
-                      (cat) => cat.id === selectedCategory
-                    )?.nombre || "Todos"
-                  }
+                  {safeCategories.find((cat) => cat.id === selectedCategory)
+                    ?.nombre || "Todos"}
                 </p>
                 <p className="text-sm mt-2">
-                  {filteredProducts.length} producto
+                  {/* {filteredProducts.length} producto
                   {filteredProducts.length !== 1 ? "s" : ""} encontrado
-                  {filteredProducts.length !== 1 ? "s" : ""}
+                  {filteredProducts.length !== 1 ? "s" : ""} */}
                 </p>
               </div>
             </div>
