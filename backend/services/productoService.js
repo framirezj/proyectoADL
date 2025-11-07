@@ -42,8 +42,8 @@ export async function obtenerPublicaciones(
     total_pages: result.total_pages,
     limit: result.limit,
     page: result.page,
-    next: result.total_pages <= result.page ? null : `${baseUrl}/api/producto?limit=${result.limit}&page=${result.page+1}`,
-    previous: result.page <= 1 ? null : `${baseUrl}/api/producto?limit=${result.limit}&page=${result.page -1}`,
+    next: result.total_pages <= result.page ? null : `${baseUrl}/api/producto?limit=${result.limit}&page=${Number(result.page)+1}`,
+    previous: result.page <= 1 ? null : `${baseUrl}/api/producto?limit=${result.limit}&page=${Number(result.page) - 1}`,
     publicaciones: result.publicaciones.map((producto) => ({
       ...producto,
       imagen: producto.url_imagen

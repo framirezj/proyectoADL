@@ -13,6 +13,10 @@ const ProductGallery = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  /* paginas */
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(2);
+  const [totalPages, setTotalPages] = useState(0);
 
   const handleDetails = (productId) => {
     navigate(`/detalle/${productId}`);
@@ -24,7 +28,6 @@ const ProductGallery = () => {
       ? products
       : products.filter((product) => product.categoria_id === selectedCategory);
 
-  
   const renderProducts = () => {
     if (loading || loadingCategorias) {
       return <Spinner />;
@@ -76,11 +79,9 @@ const ProductGallery = () => {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="card-title text-lg">{product.titulo}</h3>
                   <div className="badge badge-secondary">
-                    {
-                      safeCategories.find(
-                        (cat) => cat.id === product.categoria_id
-                      )?.nombre || "Sin categoría"
-                    }
+                    {safeCategories.find(
+                      (cat) => cat.id === product.categoria_id
+                    )?.nombre || "Sin categoría"}
                   </div>
                 </div>
                 <p className="text-base-content/70 text-sm mb-4">
@@ -104,20 +105,41 @@ const ProductGallery = () => {
             </div>
           ))}
         </div>
+        {/* paginas */}
+        <div className="join">
+          {[
+            ...Array(totalPages)].map((_, index) => (
+              <button
+                className={`join-item btn ${
+                  page === index + 1 ? "btn-active" : ""
+                }`}
+                key={index}
+                onClick={() => setPage(page + 1)}
+              >
+                {index + 1}
+              </button>
+            ))
+          }
+
+          {/* <button className="join-item btn">1</button>
+          <button className="join-item btn btn-active">2</button> */}
+        </div>
       </div>
     );
   };
 
-  
   useEffect(() => {
-    const fetchPublicaciones = async () => {
+    const fetchPublicaciones = async (page = 1, limit = 9) => {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        setError(null);
         await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        const response = await api.get("/producto");
-        setProducts(response.data.publicaciones || []);
+        const response = await api.get(`/producto?limit=${limit}&page=${page}`);
+        const data = response.data;
+        setProducts(data.publicaciones || []);
+        setTotalPages(Number(data.total_pages));
+        setLimit(Number(data.limit));
+        setPage(Number(data.page));
       } catch (err) {
         console.error(err);
         setError("Error al cargar las publicaciones");
@@ -127,10 +149,9 @@ const ProductGallery = () => {
       }
     };
 
-    fetchPublicaciones();
-  }, []);
+    fetchPublicaciones(page, limit);
+  }, [page]);
 
-  
   const safeCategories = Array.isArray(categories) ? categories : [];
 
   return (
@@ -185,11 +206,8 @@ const ProductGallery = () => {
               <div className="mt-6 p-4 bg-info text-info-content rounded-lg">
                 <p className="font-semibold">Filtro activo:</p>
                 <p className="text-lg">
-                  {
-                    safeCategories.find(
-                      (cat) => cat.id === selectedCategory
-                    )?.nombre || "Todos"
-                  }
+                  {safeCategories.find((cat) => cat.id === selectedCategory)
+                    ?.nombre || "Todos"}
                 </p>
                 <p className="text-sm mt-2">
                   {filteredProducts.length} producto
