@@ -15,7 +15,7 @@ const ProductGallery = () => {
   const navigate = useNavigate();
   /* paginas */
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
 
   const handleDetails = (productId) => {
@@ -59,6 +59,7 @@ const ProductGallery = () => {
 
     return (
       <div className="lg:w-3/4">
+        {/* productos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
             <div
@@ -106,23 +107,28 @@ const ProductGallery = () => {
           ))}
         </div>
         {/* paginas */}
-        <div className="join">
-          {[
-            ...Array(totalPages)].map((_, index) => (
-              <button
-                className={`join-item btn ${
-                  page === index + 1 ? "btn-active" : ""
-                }`}
-                key={index}
-                onClick={() => setPage(page + 1)}
-              >
-                {index + 1}
-              </button>
-            ))
-          }
+        <div className="flex justify-center mt-8">
+          <div className="join">
+            <button
+              className="join-item btn"
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+            >
+              «
+            </button>
 
-          {/* <button className="join-item btn">1</button>
-          <button className="join-item btn btn-active">2</button> */}
+            <button className="join-item btn btn-ghost no-click">
+            Página {page} / {totalPages}
+          </button>
+
+            <button
+              className="join-item btn"
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              »
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -133,7 +139,7 @@ const ProductGallery = () => {
       setLoading(true);
       setError(null);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         const response = await api.get(`/producto?limit=${limit}&page=${page}`);
         const data = response.data;
         setProducts(data.publicaciones || []);
