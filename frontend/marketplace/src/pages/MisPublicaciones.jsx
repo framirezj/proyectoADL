@@ -7,6 +7,11 @@ export default function MisPublicaciones() {
   const [publicaciones, setPublicaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  /* page */
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(3);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalRows, setTotalRows] = useState(0);
 
   const handleDelete = async (productoId) => {
     try {
@@ -143,31 +148,64 @@ export default function MisPublicaciones() {
             </div>
           </div>
         ))}
+
+        {/* paginas */}
+        <div className="flex justify-center mt-8">
+          <div className="join">
+            <button
+              className="join-item btn"
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+            >
+              «
+            </button>
+
+            <button className="join-item btn btn-ghost no-click">
+              Página {page} / {totalPages}
+            </button>
+
+            <button
+              className="join-item btn"
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              »
+            </button>
+          </div>
+        </div>
       </div>
     );
   };
 
-  useEffect(() => {
-    const fetchPublicaciones = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        // 🔹 Llamada a tu API
-        const response = await api.get("/usuarios/publicaciones");
-        // 🔹 Extraer solo el array de publicaciones
-        setPublicaciones(response.data.publicaciones || []);
-      } catch (err) {
-        console.error(err);
-        setError("Error al cargar las publicaciones");
-        setPublicaciones([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchPublicaciones = async (page = 1, limit = 3) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      // 🔹 Llamada a tu API
+      const response = await api.get(
+        `/usuarios/publicaciones?limit=${limit}&page=${page}`
+      );
 
-    fetchPublicaciones();
-  }, []);
+      const data = response.data
+      // 🔹 Extraer solo el array de publicaciones
+      setPublicaciones(data.publicaciones || []);
+      setTotalRows(Number(data.total_publicaciones));
+      setTotalPages(Number(data.total_pages));
+      setLimit(Number(data.limit));
+      setPage(Number(data.page));
+    } catch (err) {
+      console.error(err);
+      setError("Error al cargar las publicaciones");
+      setPublicaciones([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPublicaciones(page, limit);
+  }, [page]);
 
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
@@ -188,7 +226,7 @@ export default function MisPublicaciones() {
             <div className="">
               <div className="bg-primary/10 rounded-xl p-4 text-center">
                 <div className="text-2xl font-bold text-primary">
-                  {publicaciones.length}
+                  {totalRows}
                 </div>
                 <div className="text-sm text-base-content/70">Total</div>
               </div>
