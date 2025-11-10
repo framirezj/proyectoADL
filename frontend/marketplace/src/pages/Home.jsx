@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
-import api from "../src/api/axiosConfig";
+import api from "../api/axiosConfig";
 import { useState, useEffect } from "react";
-import { useCategories } from "../src/context/CategoriaContext";
+import { useCategories } from "../context/CategoriaContext";
 import Spinner from "../components/Spinner";
 
 export default function Home() {
