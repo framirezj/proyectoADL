@@ -15,7 +15,7 @@ const ProductGallery = () => {
   const navigate = useNavigate();
   /* paginas */
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(3);
+  const [limit, setLimit] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
 
@@ -135,7 +135,7 @@ const ProductGallery = () => {
     );
   };
 
-  const fetchPublicaciones = async (page = 1, limit = 9, categoria) => {
+  const fetchPublicaciones = async (page = 1, limit = 6, categoria) => {
     setLoading(true);
     setError(null);
     try {
