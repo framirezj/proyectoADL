@@ -1,32 +1,59 @@
-import pool from '../config/db.js'
+import pool from "../config/db.js";
 
-export async function selectPublicacionesUser(userId) {
+export async function selectPublicacionesUser(userId, limit = 3, page = 1) {
   try {
-    const query = ` SELECT 
-      u.id AS usuario_id,
-      u.username,
-      u.nombre,
-      COUNT(p.id) AS total_publicaciones,
-      ARRAY_AGG(
-        JSON_BUILD_OBJECT(
-          'id', p.id,
-          'titulo', p.titulo,
-          'imagen', p.url_imagen,
-          'precio', p.precio,
-          'categoria', c.nombre,
-          'fecha_creacion', p.fecha_creacion,
-          'estado', p.estado
-        )
-      ) AS publicaciones
-    FROM usuarios u
-    INNER JOIN publicaciones p ON u.id = p.usuario_id
-    INNER JOIN categorias c ON p.categoria_id = c.id
-    WHERE u.id = $1
-    GROUP BY u.id, u.username, u.nombre
-    ORDER BY total_publicaciones DESC `;
-    const values = [userId];
-    const resp = await pool.query(query, values);
-    return resp.rows[0];
+    const offset = (page - 1) * limit;
+
+    const totalQuery = `SELECT COUNT(*) FROM publicaciones WHERE usuario_id = $1;`;
+
+    const {rows: totalResult} = await pool.query(totalQuery, [userId]);
+
+    const total_rows = parseInt(totalResult[0].count, 10);
+    const total_pages = Math.ceil(total_rows / limit);
+
+    // Obtener las publicaciones paginadas con JOIN
+    const query = `
+      SELECT 
+        p.id,
+        p.titulo,
+        p.url_imagen AS imagen,
+        p.precio,
+        p.fecha_creacion,
+        p.estado,
+        c.nombre AS categoria
+      FROM publicaciones p
+      INNER JOIN categorias c ON p.categoria_id = c.id
+      WHERE p.usuario_id = $1
+      ORDER BY p.fecha_creacion DESC
+      LIMIT $2 OFFSET $3;
+    `;
+    const publicacionesResult = await pool.query(query, [
+      userId,
+      limit,
+      offset,
+    ]);
+    const publicaciones = publicacionesResult.rows;
+
+
+    // Información del usuario
+    const userQuery = `
+      SELECT id AS usuario_id, username, nombre
+      FROM usuarios
+      WHERE id = $1;
+    `;
+    const userResult = await pool.query(userQuery, [userId]);
+    const usuario = userResult.rows[0];
+
+    // Retornar estructura coherente con tu formato anterior
+    return {
+      ...usuario,
+      total_publicaciones: total_rows,
+      total_pages: total_pages,
+      page,
+      limit,
+      publicaciones,
+    };
+
   } catch (error) {
     console.error("❌ Error ejecutando selectPublicacionesUser:", error);
   }

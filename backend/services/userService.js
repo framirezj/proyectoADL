@@ -11,13 +11,32 @@ export async function findById(id) {
   return rows[0] || null;
 }
 
-export async function publicacionesUser(userId, baseUrl) {
-  const { publicaciones } = await selectPublicacionesUser(userId);
+export async function publicacionesUser(userId, baseUrl, limit = 3, page = 1) {
+  const data = await selectPublicacionesUser(userId, limit, page);
+
+  if (!data) {
+    return {
+      publicaciones: [],
+      total_publicaciones: 0,
+      total_pages: 0,
+      page,
+      limit,
+    };
+  }
+
+  const publicaciones = data.publicaciones.map((producto) => ({
+    ...producto,
+    imagen: producto.imagen ? `${baseUrl}/uploads/${producto.imagen}` : null,
+  }));
 
   return {
-    publicaciones: publicaciones.map((producto) => ({
-      ...producto,
-      imagen: producto.imagen ? `${baseUrl}/uploads/${producto.imagen}` : null,
-    })),
+    usuario_id: data.usuario_id,
+    username: data.username,
+    nombre: data.nombre,
+    total_publicaciones: data.total_publicaciones,
+    total_pages: data.total_pages,
+    page: data.page,
+    limit: data.limit,
+    publicaciones,
   };
 }
