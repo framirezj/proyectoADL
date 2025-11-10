@@ -9,7 +9,7 @@ import MisPublicaciones from "../pages/MisPublicaciones";
 import ProductoForm from "../pages/ProductoForm";
 import ShoppingCart from "../pages/Carrito";
 import ProductDetail from "../pages/DetalleProducto";
-import { useAuth } from "../src/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import ProductGallery from "../pages/Galeria";
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useCart } from "../src/context/CartContext";
-import { useCategories } from "../src/context/CategoriaContext";
-import api from "../src/api/axiosConfig";
+import { useCart } from "../context/CartContext";
+import { useCategories } from "../context/CategoriaContext";
+import api from "../api/axiosConfig";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 
