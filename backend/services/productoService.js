@@ -39,6 +39,7 @@ export async function obtenerPublicaciones(
 ) {
   const result = await selectProductos({ limit, order, page, categoria });
   return {
+    total_rows: result.total_rows,
     total_pages: result.total_pages,
     limit: result.limit,
     page: result.page,

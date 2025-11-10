@@ -38,14 +38,14 @@ export async function deleteProducto(productoId) {
 }
 
 export async function selectProductos({
-  limit = 9,
+  limit = 6,
   order = "ASC",
   page = 1,
   categoria = 0,
 }) {
   
 
-  limit = Number(limit) || 9;
+  limit = Number(limit) || 6;
   page = Number(page) || 1;
   categoria = Number(categoria) || 0;
 
@@ -87,6 +87,7 @@ export async function selectProductos({
     total_pages,
     page,
     limit,
+    total_rows
   };
 }
 
