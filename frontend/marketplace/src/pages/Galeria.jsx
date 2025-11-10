@@ -4,6 +4,7 @@ import { useCategories } from "../context/CategoriaContext";
 import api from "../api/axiosConfig";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
+import Pagination from "../components/Pagination";
 
 const ProductGallery = () => {
   const { categories, loading: loadingCategorias } = useCategories();
@@ -108,29 +109,11 @@ const ProductGallery = () => {
           ))}
         </div>
         {/* paginas */}
-        <div className="flex justify-center mt-8">
-          <div className="join">
-            <button
-              className="join-item btn"
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-            >
-              «
-            </button>
-
-            <button className="join-item btn btn-ghost no-click">
-              Página {page} / {totalPages}
-            </button>
-
-            <button
-              className="join-item btn"
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              »
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
       </div>
     );
   };

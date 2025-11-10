@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../api/axiosConfig";
 import Spinner from "../components/Spinner";
+import Pagination from "../components/Pagination";
 
 export default function MisPublicaciones() {
   const [publicaciones, setPublicaciones] = useState([]);
@@ -150,29 +151,11 @@ export default function MisPublicaciones() {
         ))}
 
         {/* paginas */}
-        <div className="flex justify-center mt-8">
-          <div className="join">
-            <button
-              className="join-item btn"
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-            >
-              «
-            </button>
-
-            <button className="join-item btn btn-ghost no-click">
-              Página {page} / {totalPages}
-            </button>
-
-            <button
-              className="join-item btn"
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              »
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
       </div>
     );
   };
@@ -187,7 +170,7 @@ export default function MisPublicaciones() {
         `/usuarios/publicaciones?limit=${limit}&page=${page}`
       );
 
-      const data = response.data
+      const data = response.data;
       // 🔹 Extraer solo el array de publicaciones
       setPublicaciones(data.publicaciones || []);
       setTotalRows(Number(data.total_publicaciones));
