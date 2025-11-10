@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useCart } from "../src/context/CartContext";
-import api from "../src/api/axiosConfig";
+import { useCart } from "../context/CartContext";
+import api from "../api/axiosConfig";
 
 export default function ProductDetail() {
   const { id } = useParams();

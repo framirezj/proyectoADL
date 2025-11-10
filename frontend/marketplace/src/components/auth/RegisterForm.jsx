@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from "../../src/api/axiosConfig";
+import api from "../../api/axiosConfig.js";
 
 
 /* 

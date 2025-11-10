@@ -1,6 +1,6 @@
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
-import { useAuth } from "../../src/context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function LayoutMain() {
 

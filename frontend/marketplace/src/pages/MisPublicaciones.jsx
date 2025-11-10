@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import api from "../src/api/axiosConfig";
+import api from "../api/axiosConfig";
 import Spinner from "../components/Spinner";
 
 export default function MisPublicaciones() {

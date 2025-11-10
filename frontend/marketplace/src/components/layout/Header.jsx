@@ -10,7 +10,7 @@ import {
   Menu,
 } from "lucide-react";
 import { useState } from "react";
-import { useCart } from "../../src/context/CartContext";
+import { useCart } from "../../context/CartContext";
 
 export default function Header({ logout, isAuthenticated }) {
   const navigate = useNavigate();

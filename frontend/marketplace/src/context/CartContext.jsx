@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { showSuccess } from '../../util/toast';
+import { showSuccess } from '../util/toast.js';
 
 const CartContext = createContext();
 
