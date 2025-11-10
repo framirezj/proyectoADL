@@ -17,18 +17,17 @@ const ProductGallery = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalRows, setTotalRows] = useState(0);
 
   const handleDetails = (productId) => {
     navigate(`/detalle/${productId}`);
   };
 
-/*   // Filtrar productos por categoría
+  /*   // Filtrar productos por categoría
   const filteredProducts =
     selectedCategory === "all"
       ? products
       : products.filter((product) => product.categoria_id === selectedCategory); */
-
-  
 
   const renderProducts = () => {
     if (loading || loadingCategorias) {
@@ -120,8 +119,8 @@ const ProductGallery = () => {
             </button>
 
             <button className="join-item btn btn-ghost no-click">
-            Página {page} / {totalPages}
-          </button>
+              Página {page} / {totalPages}
+            </button>
 
             <button
               className="join-item btn"
@@ -136,33 +135,37 @@ const ProductGallery = () => {
     );
   };
 
+  const fetchPublicaciones = async (page = 1, limit = 9, categoria) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await api.get(
+        `/producto?limit=${limit}&page=${page}&categoria=${categoria}`
+      );
+      const data = response.data;
+      setProducts(data.publicaciones || []);
+      setTotalRows(Number(data.total_rows));
+      setTotalPages(Number(data.total_pages));
+      setLimit(Number(data.limit));
+      setPage(Number(data.page));
+    } catch (err) {
+      console.error(err);
+      setError("Error al cargar las publicaciones");
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPublicaciones = async (page = 1, limit = 9, categoria) => {
-      setLoading(true);
-      setError(null);
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        const response = await api.get(`/producto?limit=${limit}&page=${page}&categoria=${categoria}`);
-        const data = response.data;
-        setProducts(data.publicaciones || []);
-        setTotalPages(Number(data.total_pages));
-        setLimit(Number(data.limit));
-        setPage(Number(data.page));
-      } catch (err) {
-        console.error(err);
-        setError("Error al cargar las publicaciones");
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPublicaciones(page, limit, selectedCategory);
-  }, [page, selectedCategory]);
+  }, [page]);
 
-
-
-
+  useEffect(() => {
+    setPage(1);
+    fetchPublicaciones(1, limit, selectedCategory);
+  }, [selectedCategory]);
 
   const safeCategories = Array.isArray(categories) ? categories : [];
 
@@ -222,9 +225,8 @@ const ProductGallery = () => {
                     ?.nombre || "Todos"}
                 </p>
                 <p className="text-sm mt-2">
-                  {/* {filteredProducts.length} producto
-                  {filteredProducts.length !== 1 ? "s" : ""} encontrado
-                  {filteredProducts.length !== 1 ? "s" : ""} */}
+                  {totalRows} producto{products.length !== 1 ? "s" : ""}{" "}
+                  encontrado{products.length !== 1 ? "s" : ""}
                 </p>
               </div>
             </div>

@@ -87,6 +87,7 @@ export async function selectProductos({
     total_pages,
     page,
     limit,
+    total_rows
   };
 }
 
