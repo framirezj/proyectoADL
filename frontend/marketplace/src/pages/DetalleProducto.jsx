@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useCategories } from "../context/CategoriaContext";
 import api from "../api/axiosConfig";
+import { formatPesos } from "../util/format";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -229,7 +230,7 @@ export default function ProductDetail() {
             {/* Precio */}
             <div className="bg-primary/10 rounded-2xl p-6">
               <p className="text-4xl font-bold text-primary">
-                ${product.precio}
+                ${formatPesos(product.precio)}
               </p>
               <p className="text-sm text-base-content/70 mt-1">
                 IVA incluido • Envío gratis

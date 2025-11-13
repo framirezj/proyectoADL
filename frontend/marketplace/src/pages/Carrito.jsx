@@ -1,4 +1,5 @@
 import { useCart } from "../context/CartContext";
+import { formatPesos } from "../util/format";
 
 const ShoppingCart = () => {
   const { cartItems, removeFromCart, clearCart } = useCart();
@@ -70,7 +71,7 @@ const ShoppingCart = () => {
                         <div className="flex-1">
                           <h3 className="card-title text-lg">{item.titulo}</h3>
                           <p className="text-lg font-bold text-primary mt-2">
-                            ${item.precio.toFixed(2)}
+                            ${formatPesos(item.precio, { decimals: 2 })}
                           </p>
                         </div>
 
@@ -109,16 +110,18 @@ const ShoppingCart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span>Subtotal ({cartItems.length} productos)</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>${formatPesos(subtotal, { decimals: 2 })}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Envío</span>
-                  <span>${shipping.toFixed(2)}</span>
+                  <span>${formatPesos(shipping, { decimals: 2 })}</span>
                 </div>
                 <div className="divider"></div>
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-primary">${total.toFixed(2)}</span>
+                  <span className="text-primary">
+                    ${formatPesos(total, { decimals: 2 })}
+                  </span>
                 </div>
               </div>
 
