@@ -165,7 +165,8 @@ export default function ProductDetail() {
                 <>
                   <li>
                     <span className="text-base-content/70">
-                      {categories.find((c) => c.id === product.categoria_id)?.nombre || "Sin categoría"}
+                      {categories.find((c) => c.id === product.categoria_id)
+                        ?.nombre || "Sin categoría"}
                     </span>
                   </li>
                   <li>
@@ -217,7 +218,8 @@ export default function ProductDetail() {
                   </h1>
                   <div className="flex items-center space-x-4 mt-2">
                     <div className="badge badge-secondary badge-lg">
-                      {categories.find((c) => c.id === product.categoria_id)?.nombre || "Sin categoría"}
+                      {categories.find((c) => c.id === product.categoria_id)
+                        ?.nombre || "Sin categoría"}
                     </div>
                   </div>
                 </div>
