@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useCategories } from "../context/CategoriaContext";
 import api from "../api/axiosConfig";
 
 export default function ProductDetail() {
@@ -9,6 +10,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { categories } = useCategories();
   const getImageUrl = (img) =>
     img?.startsWith("http")
       ? img
@@ -159,12 +161,18 @@ export default function ProductDetail() {
                   Productos
                 </button>
               </li>
-              <li>
-                <span className="text-base-content/70">{product.category}</span>
-              </li>
-              <li>
-                <span className="font-semibold">{product.name}</span>
-              </li>
+              {product && (
+                <>
+                  <li>
+                    <span className="text-base-content/70">
+                      {categories.find((c) => c.id === product.categoria_id)?.nombre || "Sin categoría"}
+                    </span>
+                  </li>
+                  <li>
+                    <span className="font-semibold">{product.titulo}</span>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
           <button onClick={handleGoBack} className="btn btn-ghost btn-circle">
@@ -209,7 +217,7 @@ export default function ProductDetail() {
                   </h1>
                   <div className="flex items-center space-x-4 mt-2">
                     <div className="badge badge-secondary badge-lg">
-                      {product.category || "buscar categoria"}
+                      {categories.find((c) => c.id === product.categoria_id)?.nombre || "Sin categoría"}
                     </div>
                   </div>
                 </div>
