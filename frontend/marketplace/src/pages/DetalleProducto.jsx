@@ -9,7 +9,10 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const getImageUrl = (img) =>
+    img?.startsWith("http")
+      ? img
+      : `${import.meta.env.VITE_API_URL}/uploads/${img}`;
 
   //data
   useEffect(() => {
@@ -18,23 +21,21 @@ export default function ProductDetail() {
         setLoading(true);
         // 🔹 Llamada a tu API
         const response = await api.get(`/producto/${id}`);
-        
-       // 🔹 Extraer solo el array de publicaciones
+
+        // 🔹 Extraer solo el array de publicaciones
         setProduct(response.data);
       } catch (err) {
         console.error(err);
         //setError("Error al cargar las publicaciones");
       } finally {
         setLoading(false);
-        
       }
     };
 
     fetchPublicaciones();
-    
   }, [id]);
 
-/*   // Datos de prueba mejorados
+  /*   // Datos de prueba mejorados
   const productsData = {
     1: {
       id: 1,
@@ -78,8 +79,8 @@ export default function ProductDetail() {
       fullDescription:
         "El Smartphone Ultra X Pro redefine la experiencia móvil con su pantalla AMOLED de 6.7 pulgadas y tasa de refresco de 120Hz. Equipado con el procesador más rápido del mercado, 8GB de RAM y 256GB de almacenamiento. La cámara cuádruple de 108MP captura fotos profesionales en cualquier condición de luz.",
       features: [
-        "Pantalla AMOLED 6.7'' 120Hz",
-        "Cámara principal 108MP + ultra gran angular",
+                    <img
+                      src={getImageUrl(product.imagen)}
         "Batería de 5000mAh con carga rápida 65W",
         "Procesador Snapdragon 8 Gen 2",
         "8GB RAM + 256GB almacenamiento",
@@ -190,7 +191,7 @@ export default function ProductDetail() {
             {/* Imagen principal */}
             <div className="bg-base-100 rounded-2xl shadow-lg overflow-hidden">
               <img
-                src={product.imagen}
+                src={getImageUrl(product.imagen)}
                 alt={product.titulo}
                 className="w-full h-96 object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -208,7 +209,7 @@ export default function ProductDetail() {
                   </h1>
                   <div className="flex items-center space-x-4 mt-2">
                     <div className="badge badge-secondary badge-lg">
-                      {product.category || 'buscar categoria'}
+                      {product.category || "buscar categoria"}
                     </div>
                   </div>
                 </div>
