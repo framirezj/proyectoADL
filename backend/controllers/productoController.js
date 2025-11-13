@@ -10,7 +10,7 @@ import {
 export async function addProducto(req, res) {
   try {
     const { titulo, categoria, condicion, descripcion, precio } = req.body;
-    const imagen = req.file ? req.file.filename : null;
+    const imagen = req.file ? req.file.path : null;
     const userId = req.user.userId;
 
     const producto = await crearProducto({
