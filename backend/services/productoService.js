@@ -34,14 +34,14 @@ export async function borrarProducto(productoId) {
 }
 
 export async function obtenerPublicaciones(
-  baseUrl,
-  { limit, order, page, categoria }
+  /* baseUrl */
+  { limit, order, page, categoria },
+  request
 ) {
   const result = await selectProductos({ limit, order, page, categoria });
-  const resolveImageUrl = (base, url) => {
-    if (!url) return null;
-    return /^https?:\/\//i.test(url) ? url : `${base}/uploads/${url}`;
-  };
+
+  const baseUrl = request ? `${new URL(request.url).origin}` : "";
+
   return {
     total_rows: result.total_rows,
     total_pages: result.total_pages,
@@ -61,12 +61,12 @@ export async function obtenerPublicaciones(
           }`,
     publicaciones: result.publicaciones.map((producto) => ({
       ...producto,
-      imagen: resolveImageUrl(baseUrl, producto.url_imagen),
+      imagen: producto.url_imagen || null,
     })),
   };
 }
 
-export async function obtenerPublicacion(productoId, baseUrl) {
+export async function obtenerPublicacion(productoId) {
   const result = await selectProducto(productoId);
   const resolveImageUrl = (base, url) => {
     if (!url) return null;
@@ -74,11 +74,11 @@ export async function obtenerPublicacion(productoId, baseUrl) {
   };
   return {
     ...result,
-    imagen: resolveImageUrl(baseUrl, result.url_imagen),
+    imagen: result.url_imagen || null,
   };
 }
 
-export async function obtenerPublicacionesRandom(baseUrl) {
+export async function obtenerPublicacionesRandom() {
   const publicaciones = await selectRandom();
   const resolveImageUrl = (base, url) => {
     if (!url) return null;
@@ -87,7 +87,7 @@ export async function obtenerPublicacionesRandom(baseUrl) {
   return {
     publicaciones: publicaciones.map((producto) => ({
       ...producto,
-      imagen: resolveImageUrl(baseUrl, producto.url_imagen),
+      imagen: producto.url_imagen || null,
     })),
   };
 }
