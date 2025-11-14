@@ -1,33 +1,33 @@
 import pkg from "pg";
 import dotenv from "dotenv";
 
-dotenv.config(); // Cargar variables de entorno desde .env
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
 
 const { Pool } = pkg;
+const isProd = process.env.NODE_ENV === "production";
 
-// Crear un pool de conexiones
 const pool = new Pool({
-  user: process.env.DB_USER || "postgres",  
-  host: process.env.DB_HOST || "localhost",      
+  user: process.env.DB_USER || "postgres",
+  host: process.env.DB_HOST || "localhost",
   database: process.env.DB_NAME || "marketplace",
-  password: process.env.DB_PASS || "postgres", 
-  port: process.env.DB_PORT || 5432, // puerto de PostgreSQL
+  password: process.env.DB_PASS || "postgres",
+  port: Number(process.env.DB_PORT) || 5432,
+  ssl: isProd ? { rejectUnauthorized: false } : false,
 });
 
-// Probar la conexión al iniciar
-pool.connect()
-  .then(client => {
+pool
+  .connect()
+  .then((client) => {
     console.log("✅ Conectado a PostgreSQL");
-    client.release(); 
+    client.release();
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("❌ Error al conectar a PostgreSQL:", err.message);
   });
 
-// Exportar pool para usar en queries
 export default pool;
-
-
 
 /*
 

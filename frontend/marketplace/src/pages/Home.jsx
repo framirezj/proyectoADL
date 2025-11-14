@@ -4,6 +4,7 @@ import api from "../api/axiosConfig";
 import { useState, useEffect } from "react";
 import { useCategories } from "../context/CategoriaContext";
 import Spinner from "../components/Spinner";
+import { formatPesos } from "../util/format";
 
 export default function Home() {
   const [publicaciones, setPublicaciones] = useState([]);
@@ -94,7 +95,7 @@ export default function Home() {
                 />
                 <div className="absolute top-4 right-4">
                   <div className="badge badge-primary badge-lg font-semibold">
-                    ${product.precio || "0"}
+                    ${formatPesos(product.precio || 0)}
                   </div>
                 </div>
                 <div className="absolute top-4 left-4">

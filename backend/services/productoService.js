@@ -68,7 +68,10 @@ export async function obtenerPublicaciones(
 
 export async function obtenerPublicacion(productoId) {
   const result = await selectProducto(productoId);
-
+  const resolveImageUrl = (base, url) => {
+    if (!url) return null;
+    return /^https?:\/\//i.test(url) ? url : `${base}/uploads/${url}`;
+  };
   return {
     ...result,
     imagen: result.url_imagen || null,
@@ -77,6 +80,10 @@ export async function obtenerPublicacion(productoId) {
 
 export async function obtenerPublicacionesRandom() {
   const publicaciones = await selectRandom();
+  const resolveImageUrl = (base, url) => {
+    if (!url) return null;
+    return /^https?:\/\//i.test(url) ? url : `${base}/uploads/${url}`;
+  };
   return {
     publicaciones: publicaciones.map((producto) => ({
       ...producto,
