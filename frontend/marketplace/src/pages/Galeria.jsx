@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useCategories } from "../context/CategoriaContext";
 import api from "../api/axiosConfig";
+import { formatPesos } from "../util/format";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import Pagination from "../components/Pagination";
@@ -92,7 +93,7 @@ const ProductGallery = () => {
                 </p>
                 <div className="card-actions justify-between items-center">
                   <span className="text-2xl font-bold text-primary">
-                    ${product.precio}
+                    ${formatPesos(product.precio)}
                   </span>
                   <button
                     className="btn btn-primary btn-sm"
@@ -143,11 +144,10 @@ const ProductGallery = () => {
 
   useEffect(() => {
     fetchPublicaciones(page, limit, selectedCategory);
-  }, [page]);
+  }, [page, limit, selectedCategory]);
 
   useEffect(() => {
     setPage(1);
-    fetchPublicaciones(1, limit, selectedCategory);
   }, [selectedCategory]);
 
   const safeCategories = Array.isArray(categories) ? categories : [];
