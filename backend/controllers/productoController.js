@@ -61,9 +61,7 @@ export async function obtenerPublicaciones(req, res) {
   }
 
   try {
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-
-    const response = await obtener(baseUrl, { limit, order, page, categoria });
+    const response = await obtener({ limit, order, page, categoria });
 
     res.status(200).json(response);
   } catch (error) {
@@ -75,15 +73,13 @@ export async function obtenerPublicaciones(req, res) {
 }
 
 export async function obtenerPublicacion(req, res) {
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
   const { id: productoId } = req.params;
-  res.status(200).json(await obtenerById(productoId, baseUrl));
+  res.status(200).json(await obtenerById(productoId));
 }
 
 export async function obtenerPublicacionesRandom(req, res) {
   try {
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-    res.status(200).json(await obtenerRandom(baseUrl));
+    res.status(200).json(await obtenerRandom());
   } catch (error) {
     console.error("Error al obtener los registros:", error.message);
     res
