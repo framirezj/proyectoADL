@@ -26,7 +26,7 @@ export async function publicacionesUser(userId, baseUrl, limit = 3, page = 1) {
 
   const publicaciones = data.publicaciones.map((producto) => ({
     ...producto,
-    imagen: producto.imagen ? `${baseUrl}/uploads/${producto.imagen}` : null,
+    imagen: producto.imagen || null,
   }));
 
   return {
