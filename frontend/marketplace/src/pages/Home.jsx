@@ -98,11 +98,22 @@ export default function Home() {
                     ${formatPesos(product.precio || 0)}
                   </div>
                 </div>
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
                   <div className="badge badge-secondary badge-outline">
                     {categories.find((cat) => cat.id === product.categoria_id)
                       ?.nombre || "Sin categoría"}
                   </div>
+                  {product.estado && (
+                    <span
+                      className={`badge ${
+                        product.estado === "nuevo"
+                          ? "badge-success"
+                          : "badge-warning"
+                      } text-white font-semibold`}
+                    >
+                      {product.estado === "nuevo" ? "Nuevo" : "Usado"}
+                    </span>
+                  )}
                 </div>
               </figure>
               <div className="card-body p-6">

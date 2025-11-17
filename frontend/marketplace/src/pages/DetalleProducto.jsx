@@ -222,6 +222,17 @@ export default function ProductDetail() {
                       {categories.find((c) => c.id === product.categoria_id)
                         ?.nombre || "Sin categoría"}
                     </div>
+                    {product.estado && (
+                      <span
+                        className={`badge ${
+                          product.estado === "nuevo"
+                            ? "badge-success"
+                            : "badge-warning"
+                        } badge-lg text-white font-semibold`}
+                      >
+                        {product.estado === "nuevo" ? "Nuevo" : "Usado"}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

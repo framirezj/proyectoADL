@@ -82,10 +82,23 @@ const ProductGallery = () => {
               <div className="card-body">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="card-title text-lg">{product.titulo}</h3>
-                  <div className="badge badge-secondary">
-                    {safeCategories.find(
-                      (cat) => cat.id === product.categoria_id
-                    )?.nombre || "Sin categoría"}
+                  <div className="flex items-center gap-2">
+                    <div className="badge badge-secondary">
+                      {safeCategories.find(
+                        (cat) => cat.id === product.categoria_id
+                      )?.nombre || "Sin categoría"}
+                    </div>
+                    {product.estado && (
+                      <span
+                        className={`badge ${
+                          product.estado === "nuevo"
+                            ? "badge-success"
+                            : "badge-warning"
+                        } badge-outline text-white font-semibold`}
+                      >
+                        {product.estado === "nuevo" ? "Nuevo" : "Usado"}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <p className="text-base-content/70 text-sm mb-4">
