@@ -122,6 +122,21 @@ export default function MisPublicaciones() {
                   {/* Acciones */}
                   <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
                     <div className="flex flex-wrap gap-2">
+                      <Link
+                        to={`/editar/${publicacion.id}`}
+                        className="btn btn-outline btn-primary btn-sm gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                        </svg>
+                        Editar
+                      </Link>
+
                       <button
                         className="btn btn-outline btn-error btn-sm gap-2"
                         onClick={() => handleDelete(publicacion.id)}

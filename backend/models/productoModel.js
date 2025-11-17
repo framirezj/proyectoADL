@@ -110,3 +110,62 @@ export async function selectPublicacionesRandom() {
 
   return rows;
 }
+
+export async function updateProducto({
+  productoId,
+  titulo,
+  categoria,
+  condicion,
+  descripcion,
+  precio,
+  imagen,
+}) {
+  const fields = [];
+  const values = [];
+  let idx = 1;
+
+  if (categoria !== undefined) {
+    fields.push(`categoria_id = $${idx++}`);
+    values.push(categoria);
+  }
+  if (titulo !== undefined) {
+    fields.push(`titulo = $${idx++}`);
+    values.push(titulo);
+  }
+  if (descripcion !== undefined) {
+    fields.push(`descripcion = $${idx++}`);
+    values.push(descripcion);
+  }
+  if (precio !== undefined) {
+    fields.push(`precio = $${idx++}`);
+    values.push(precio);
+  }
+  if (imagen !== undefined) {
+    fields.push(`url_imagen = $${idx++}`);
+    values.push(imagen);
+  }
+  if (condicion !== undefined) {
+    fields.push(`estado = $${idx++}`);
+    values.push(condicion);
+  }
+
+  if (fields.length === 0) {
+    const { rows } = await pool.query(
+      `SELECT * FROM publicaciones WHERE id = $1`,
+      [productoId]
+    );
+    return rows[0];
+  }
+
+  const query = `
+    UPDATE publicaciones
+    SET ${fields.join(", ")}
+    WHERE id = $${idx}
+    RETURNING *;
+  `;
+
+  values.push(productoId);
+
+  const { rows } = await pool.query(query, values);
+  return rows[0];
+}

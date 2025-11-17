@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCategories } from "../context/CategoriaContext.jsx";
 import api from "../api/axiosConfig.js";
 import Spinner from "../components/Spinner.jsx";
@@ -19,6 +19,9 @@ export default function ProductoForm() {
   const [error, setError] = useState("");
   const [previewImage, setPreviewImage] = useState("");
   const navigate = useNavigate();
+  const params = useParams();
+  const productoId = params.id;
+  const isEdit = Boolean(productoId);
 
   const {
     categories,
@@ -27,6 +30,46 @@ export default function ProductoForm() {
   } = useCategories();
 
   const safeCategories = Array.isArray(categories) ? categories : [];
+
+  // Si estamos en modo edición, cargar datos del producto
+  useEffect(() => {
+    if (!isEdit) return;
+
+    let mounted = true;
+
+    const fetchProducto = async () => {
+      try {
+        setLoading(true);
+        const resp = await api.get(`/producto/${productoId}`);
+        const data = resp.data || {};
+
+        if (!mounted) return;
+
+        setFormData((prev) => ({
+          ...prev,
+          titulo: data.titulo || "",
+          categoria: data.categoria_id || data.categoria || "",
+          precio: data.precio !== undefined ? String(data.precio) : "",
+          descripcion: data.descripcion || "",
+          condicion: data.estado || data.condicion || "",
+          imagen: null,
+        }));
+
+        if (data.imagen) setPreviewImage(data.imagen);
+      } catch (err) {
+        console.error("Error cargando producto:", err);
+        setError("No se pudo cargar el producto para editar");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchProducto();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isEdit, productoId]);
 
   // Manejar cambios de input
   const handleChange = (e) => {
@@ -93,21 +136,30 @@ export default function ProductoForm() {
       submitData.append("condicion", formData.condicion);
       if (formData.imagen) submitData.append("imagen", formData.imagen);
 
-      const response = await api.post("/producto/nuevo", submitData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (response.status === 201) {
-        showSuccess("Producto publicado exitosamente!")
-        navigate("/mispublicaciones");
+      if (isEdit) {
+        const putResp = await api.put(`/producto/${productoId}`, submitData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (putResp.status === 200) {
+          showSuccess("Producto actualizado exitosamente!");
+          navigate("/mispublicaciones");
+        }
+      } else {
+        const response = await api.post("/producto/nuevo", submitData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (response.status === 201) {
+          showSuccess("Producto publicado exitosamente!");
+          navigate("/mispublicaciones");
+        }
       }
-
-      
     } catch (error) {
       console.error("Error al publicar producto:", error);
 
       if (error.response) {
-        setError(error.response.data.message || "Error al publicar el producto");
+        setError(
+          error.response.data.message || "Error al publicar el producto"
+        );
       } else if (error.request) {
         setError("Error de conexión con el servidor");
       } else {
@@ -127,7 +179,7 @@ export default function ProductoForm() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-base-content mb-3">
-            Publicar Nuevo Producto
+            {isEdit ? "Editar Producto" : "Publicar Nuevo Producto"}
           </h1>
           <p className="text-lg text-base-content/70">
             Completa la información de tu producto para comenzar a vender
@@ -350,6 +402,8 @@ export default function ProductoForm() {
                 >
                   {loading ? (
                     <span className="loading loading-spinner text-primary"></span>
+                  ) : isEdit ? (
+                    "Guardar Cambios"
                   ) : (
                     "Publicar Producto"
                   )}

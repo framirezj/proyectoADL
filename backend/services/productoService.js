@@ -4,6 +4,7 @@ import {
   selectProductos,
   selectProducto,
   selectPublicacionesRandom as selectRandom,
+  updateProducto as modelUpdateProducto,
 } from "../models/productoModel.js";
 
 export async function crearProducto(data) {
@@ -31,6 +32,34 @@ export async function crearProducto(data) {
 
 export async function borrarProducto(productoId) {
   return await deleteProducto(productoId);
+}
+
+export async function actualizarProducto(productoId, data, user) {
+  // Verificar existencia y permisos
+  const producto = await selectProducto(productoId);
+  if (!producto) throw new Error("Producto no encontrado");
+
+  // Solo el dueño (usuario_id) o admin puede actualizar
+  if (producto.usuario_id !== user.userId && user.role !== "admin") {
+    const err = new Error("No tienes permisos para editar este producto");
+    err.status = 403;
+    throw err;
+  }
+
+  // Preparar datos para modelo
+  const { titulo, categoria, condicion, descripcion, precio, imagen } = data;
+
+  const updated = await modelUpdateProducto({
+    productoId,
+    titulo,
+    categoria,
+    condicion,
+    descripcion,
+    precio,
+    imagen,
+  });
+
+  return updated;
 }
 
 export async function obtenerPublicaciones(

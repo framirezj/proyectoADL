@@ -5,6 +5,7 @@ import {
   obtenerPublicaciones as obtener,
   obtenerPublicacion as obtenerById,
   obtenerPublicacionesRandom as obtenerRandom,
+  actualizarProducto as servicioActualizar,
 } from "../services/productoService.js";
 
 export async function addProducto(req, res) {
@@ -85,5 +86,38 @@ export async function obtenerPublicacionesRandom(req, res) {
     res
       .status(500)
       .json({ error: error.message || "Error al obtener los registros" });
+  }
+}
+
+export async function actualizarPublicacion(req, res) {
+  try {
+    const { id: productoId } = req.params;
+    const { titulo, categoria, condicion, descripcion, precio } = req.body;
+    const imagen = req.file ? req.file.path : undefined;
+
+    const updated = await servicioActualizar(
+      productoId,
+      {
+        titulo,
+        categoria,
+        condicion,
+        descripcion,
+        precio,
+        imagen,
+      },
+      req.user
+    );
+
+    res
+      .status(200)
+      .json({ message: "Producto actualizado", producto: updated });
+  } catch (error) {
+    console.error("Error actualizarPublicacion:", error.message);
+    if (error.status === 403) {
+      return res.status(403).json({ error: error.message });
+    }
+    res
+      .status(500)
+      .json({ error: error.message || "Error al actualizar producto" });
   }
 }
