@@ -11,36 +11,43 @@ export const CategoriesProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      setLoading(true);
+      setError(null);
 
-        // Intentar cargar desde cache primero para mostrar rápido
+      // 1. Cargar desde cache para un renderizado rápido
+      try {
         const cached = localStorage.getItem("marketplace_categories");
-        if (cached && cached !== "undefined") {
+        if (cached) {
           setCategories(JSON.parse(cached));
         }
+      } catch (e) {
+        console.error("Error parsing categories from localStorage", e);
+      }
 
-        // Luego actualizar desde API
-        const response = await api.get('/categoria',
-          {
-            timeout: 10000, // 10 segundos timeout
-          }
-        );
+      // 2. Actualizar desde la API
+      try {
+        const response = await api.get("/categoria", {
+          timeout: 10000, // 10 segundos timeout
+        });
 
         const newCategories = response.data.categorias;
-        setCategories(newCategories);
-        localStorage.setItem(
-          "marketplace_categories",
-          JSON.stringify(newCategories)
-        );
+
+        // Solo actualizar si los datos son diferentes para evitar re-renders innecesarios
+        if (JSON.stringify(newCategories) !== JSON.stringify(categories)) {
+          setCategories(newCategories);
+          localStorage.setItem(
+            "marketplace_categories",
+            JSON.stringify(newCategories)
+          );
+        }
       } catch (err) {
-        setError(err.response?.data?.message || "Error cargando categorías");
+        const errorMessage =
+          err.response?.data?.message || "Error cargando categorías";
+        setError(errorMessage);
         console.error("Categories API error:", err);
 
-        // Si no hay cache y falló la API, mantener loading false
-        const cached = localStorage.getItem("marketplace_categories");
-        if (!cached) {
+        // Si la API falla y no hay nada en cache, limpiar las categorías
+        if (categories.length === 0) {
           setCategories([]);
         }
       } finally {
@@ -49,23 +56,28 @@ export const CategoriesProvider = ({ children }) => {
     };
 
     fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Función para forzar recarga (útil cuando se agregan categorías)
+  // Función para forzar recarga
   const refreshCategories = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios.get("/api/categories");
-      const newCategories = response.data;
+      const response = await api.get("/categoria"); // Corregido: usar api y endpoint correcto
+      const newCategories = response.data.categorias; // Corregido: acceder a la propiedad correcta
       setCategories(newCategories);
       localStorage.setItem(
         "marketplace_categories",
         JSON.stringify(newCategories)
       );
+      setError(null); // Limpiar errores previos
       return newCategories;
     } catch (err) {
-      setError(err.response?.data?.message || "Error actualizando categorías");
-      throw err;
+      const errorMessage =
+        err.response?.data?.message || "Error actualizando categorías";
+      setError(errorMessage);
+      console.error("Error refreshing categories:", err);
+      throw err; // Relanzar para que el llamador pueda manejarlo
     } finally {
       setLoading(false);
     }
