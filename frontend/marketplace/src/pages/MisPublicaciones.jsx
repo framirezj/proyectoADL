@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axiosConfig";
 import Spinner from "../components/Spinner";
 import Pagination from "../components/Pagination";
+import { formatPesos } from "../util/format";
 
 export default function MisPublicaciones() {
   const [publicaciones, setPublicaciones] = useState([]);
@@ -114,7 +115,7 @@ export default function MisPublicaciones() {
 
                     <div className="mt-4 lg:mt-0 lg:text-right">
                       <div className="text-3xl font-bold text-primary mb-2">
-                        ${publicacion.precio}
+                        ${formatPesos(publicacion.precio)}
                       </div>
                     </div>
                   </div>
