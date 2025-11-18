@@ -5,6 +5,7 @@ import {
   selectProducto,
   selectPublicacionesRandom as selectRandom,
   updateProducto as modelUpdateProducto,
+  markProductosVendidos,
 } from "../models/productoModel.js";
 
 export async function crearProducto(data) {
@@ -141,4 +142,32 @@ export async function obtenerPublicacionesRandom() {
       imagen: producto.url_imagen || null,
     })),
   };
+}
+
+export async function checkoutMarcarVendidos(ids, user) {
+  // Requiere autenticación, pero no requiere ser dueño: es una operación de compra
+  if (!user || !user.userId) {
+    const err = new Error("No autenticado");
+    err.status = 401;
+    throw err;
+  }
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    const err = new Error("Debe enviar una lista de IDs de productos");
+    err.status = 400;
+    throw err;
+  }
+
+  const cleanIds = ids
+    .map((v) => Number(v))
+    .filter((n) => Number.isInteger(n) && n > 0);
+
+  if (cleanIds.length === 0) {
+    const err = new Error("IDs de productos inválidos");
+    err.status = 400;
+    throw err;
+  }
+
+  const updatedIds = await markProductosVendidos(cleanIds);
+  return { updatedCount: updatedIds.length, updatedIds };
 }

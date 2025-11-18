@@ -7,6 +7,7 @@ import {
   obtenerPublicacion,
   obtenerPublicacionesRandom,
   actualizarPublicacion,
+  checkoutProductos,
 } from "../controllers/productoController.js";
 import upload from "../middlewares/upload.js";
 
@@ -22,5 +23,6 @@ router.get("/", obtenerPublicaciones);
 router.get("/random", obtenerPublicacionesRandom);
 router.get("/:id", obtenerPublicacion);
 router.put("/:id", auth, upload.single("imagen"), actualizarPublicacion);
+router.post("/checkout", auth, checkoutProductos);
 
 export default router;

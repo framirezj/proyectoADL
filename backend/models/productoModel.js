@@ -178,3 +178,16 @@ export async function updateProducto({
   const { rows } = await pool.query(query, values);
   return rows[0];
 }
+
+export async function markProductosVendidos(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+  const query = `
+    UPDATE publicaciones
+    SET estado = 'vendido'
+    WHERE id = ANY($1::int[]) AND estado <> 'vendido'
+    RETURNING id;
+  `;
+  const values = [ids.map((v) => Number(v)).filter((n) => Number.isInteger(n))];
+  const { rows } = await pool.query(query, values);
+  return rows.map((r) => r.id);
+}

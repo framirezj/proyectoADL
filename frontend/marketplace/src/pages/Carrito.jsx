@@ -203,15 +203,8 @@ const ShoppingCart = () => {
                     setProcessing(true);
                     const toastId = showLoading("Procesando pago...");
                     // Simulación: marcar productos como vendidos en backend
-                    for (const item of cartItems) {
-                      try {
-                        await api.put(`/producto/${item.id}`, {
-                          condicion: "vendido",
-                        });
-                      } catch (e) {
-                        console.error("Error marcando vendido:", e);
-                      }
-                    }
+                    const ids = cartItems.map((i) => i.id);
+                    await api.post("/producto/checkout", { ids });
                     dismissToast(toastId);
                     showSuccess(
                       `Enviamos los datos de pago a ${

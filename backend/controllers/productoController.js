@@ -6,6 +6,7 @@ import {
   obtenerPublicacion as obtenerById,
   obtenerPublicacionesRandom as obtenerRandom,
   actualizarProducto as servicioActualizar,
+  checkoutMarcarVendidos,
 } from "../services/productoService.js";
 
 export async function addProducto(req, res) {
@@ -125,5 +126,22 @@ export async function actualizarPublicacion(req, res) {
     res
       .status(500)
       .json({ error: error.message || "Error al actualizar producto" });
+  }
+}
+
+export async function checkoutProductos(req, res) {
+  try {
+    const { ids } = req.body || {};
+    const result = await checkoutMarcarVendidos(ids, req.user);
+    return res.status(200).json({
+      message: "Productos marcados como vendidos",
+      ...result,
+    });
+  } catch (error) {
+    console.error("Error en checkoutProductos:", error.message);
+    const status = error.status || 500;
+    return res
+      .status(status)
+      .json({ error: error.message || "Error en checkout" });
   }
 }
