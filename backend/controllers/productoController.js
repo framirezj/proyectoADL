@@ -5,6 +5,8 @@ import {
   obtenerPublicaciones as obtener,
   obtenerPublicacion as obtenerById,
   obtenerPublicacionesRandom as obtenerRandom,
+  actualizarProducto as servicioActualizar,
+  checkoutMarcarVendidos,
 } from "../services/productoService.js";
 
 export async function addProducto(req, res) {
@@ -38,10 +40,16 @@ export async function addProducto(req, res) {
 export async function borrarProducto(req, res) {
   try {
     const { id: productoId } = req.params;
-    await borrar(productoId);
+    await borrar(productoId, req.user);
     res.status(204).send();
   } catch (error) {
     console.error("Error al remover producto:", error.message);
+    if (error.status === 403) {
+      return res.status(403).json({ error: error.message });
+    }
+    if (error.status === 404) {
+      return res.status(404).json({ error: error.message });
+    }
     res
       .status(500)
       .json({ error: error.message || "Error al remover producto" });
@@ -49,7 +57,7 @@ export async function borrarProducto(req, res) {
 }
 
 export async function obtenerPublicaciones(req, res) {
-  const { limit, order, page = 1, categoria } = req.query;
+  const { limit, order, page = 1, categoria, estado } = req.query;
   // Utilizar una expresión regular para verificar si 'page' es un número válido
   const isPageValid = /^[1-9]\d*$/.test(page);
 
@@ -61,9 +69,7 @@ export async function obtenerPublicaciones(req, res) {
   }
 
   try {
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-
-    const response = await obtener(baseUrl, { limit, order, page, categoria });
+    const response = await obtener({ limit, order, page, categoria, estado });
 
     res.status(200).json(response);
   } catch (error) {
@@ -75,19 +81,67 @@ export async function obtenerPublicaciones(req, res) {
 }
 
 export async function obtenerPublicacion(req, res) {
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
   const { id: productoId } = req.params;
-  res.status(200).json(await obtenerById(productoId, baseUrl));
+  res.status(200).json(await obtenerById(productoId));
 }
 
 export async function obtenerPublicacionesRandom(req, res) {
   try {
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-    res.status(200).json(await obtenerRandom(baseUrl));
+    res.status(200).json(await obtenerRandom());
   } catch (error) {
     console.error("Error al obtener los registros:", error.message);
     res
       .status(500)
       .json({ error: error.message || "Error al obtener los registros" });
+  }
+}
+
+export async function actualizarPublicacion(req, res) {
+  try {
+    const { id: productoId } = req.params;
+    const { titulo, categoria, condicion, descripcion, precio } = req.body;
+    const imagen = req.file ? req.file.path : undefined;
+
+    const updated = await servicioActualizar(
+      productoId,
+      {
+        titulo,
+        categoria,
+        condicion,
+        descripcion,
+        precio,
+        imagen,
+      },
+      req.user
+    );
+
+    res
+      .status(200)
+      .json({ message: "Producto actualizado", producto: updated });
+  } catch (error) {
+    console.error("Error actualizarPublicacion:", error.message);
+    if (error.status === 403) {
+      return res.status(403).json({ error: error.message });
+    }
+    res
+      .status(500)
+      .json({ error: error.message || "Error al actualizar producto" });
+  }
+}
+
+export async function checkoutProductos(req, res) {
+  try {
+    const { ids } = req.body || {};
+    const result = await checkoutMarcarVendidos(ids, req.user);
+    return res.status(200).json({
+      message: "Productos marcados como vendidos",
+      ...result,
+    });
+  } catch (error) {
+    console.error("Error en checkoutProductos:", error.message);
+    const status = error.status || 500;
+    return res
+      .status(status)
+      .json({ error: error.message || "Error en checkout" });
   }
 }

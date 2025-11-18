@@ -84,7 +84,9 @@ export default function Home() {
           {publicaciones.map((product) => (
             <div
               key={product.id}
-              className="card bg-base-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+              className={`card bg-base-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group ${
+                product.estado === "vendido" ? "opacity-80" : ""
+              }`}
               onClick={() => handleDetails(product.id)}
             >
               <figure className="relative overflow-hidden">
@@ -93,16 +95,34 @@ export default function Home() {
                   alt={product.titulo || "Producto sin título"}
                   className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                {product.estado === "vendido" && (
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <span className="badge badge-error text-white badge-lg">
+                      Vendido
+                    </span>
+                  </div>
+                )}
                 <div className="absolute top-4 right-4">
                   <div className="badge badge-primary badge-lg font-semibold">
                     ${formatPesos(product.precio || 0)}
                   </div>
                 </div>
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
                   <div className="badge badge-secondary badge-outline">
                     {categories.find((cat) => cat.id === product.categoria_id)
                       ?.nombre || "Sin categoría"}
                   </div>
+                  {product.estado && (
+                    <span
+                      className={`badge ${
+                        product.estado === "nuevo"
+                          ? "badge-success"
+                          : "badge-warning"
+                      } text-white font-semibold`}
+                    >
+                      {product.estado === "nuevo" ? "Nuevo" : "Usado"}
+                    </span>
+                  )}
                 </div>
               </figure>
               <div className="card-body p-6">
@@ -115,15 +135,22 @@ export default function Home() {
                   {product.descripcion || "Sin descripción disponible"}
                 </p>
                 <div className="card-actions justify-between items-center">
-                  <button
-                    className="btn btn-ghost btn-sm text-primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDetails(product.id);
-                    }}
-                  >
-                    Ver detalles →
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      className="btn btn-ghost btn-sm text-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDetails(product.id);
+                      }}
+                    >
+                      Ver detalles →
+                    </button>
+                    {product.estado === "vendido" ? (
+                      <span className="badge badge-error text-white">
+                        Vendido
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>
@@ -154,18 +181,28 @@ export default function Home() {
       >
         <div className="hero-overlay bg-opacity-60"></div>
         <div className="hero-content text-neutral-content text-center">
-          <div className="max-w-xl">
-            <h1 className="mb-5 text-5xl font-bold">Bienvenido a Pulga Vibe</h1>
+          <div className="w-full max-w-3xl mx-4 glass p-6 md:p-8 text-base-content">
+            <h1 className="mb-5 text-4xl md:text-5xl font-bold md:whitespace-nowrap">
+              Bienvenido a Pulga Vibe
+            </h1>
             <p className="mb-5 text-lg">
               Descubre productos únicos y encuentra las mejores ofertas en
               nuestra comunidad
             </p>
-            <button
-              className="btn btn-primary btn-lg"
-              onClick={() => navigate("/catalogo")}
-            >
-              Explorar Productos
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                className="btn btn-primary btn-lg shadow-2xl ring ring-offset-2 ring-primary/40"
+                onClick={() => navigate("/catalogo")}
+              >
+                Explorar Productos
+              </button>
+              <button
+                className="btn btn-outline btn-secondary btn-lg bg-base-100/80 hover:bg-secondary hover:text-secondary-content shadow-xl"
+                onClick={() => navigate("/nuevo")}
+              >
+                Publicar Producto
+              </button>
+            </div>
           </div>
         </div>
       </div>

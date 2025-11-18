@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext';
-import { User } from 'lucide-react';
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { User } from "lucide-react";
 
 export default function MiPerfil() {
-
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   return (
     <div className="flex flex-col items-center bg-base-200 border-base-300 border p-10 max-w-md mx-auto mt-8">
@@ -17,7 +16,7 @@ export default function MiPerfil() {
         {/* Avatar de Usuario */}
         <div className="avatar mb-6">
           <div className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center text-2xl font-bold">
-            <User size={48}/>
+            <User size={48} />
           </div>
         </div>
 
@@ -38,13 +37,11 @@ export default function MiPerfil() {
               <span className="text-base">{user.email}</span>
             </div>
           </div>
-
-          
         </div>
 
         {/* Botones de Acción */}
         <div className="flex flex-col gap-3 w-full mt-8">
-          <button className="btn btn-primary w-full gap-2">
+          <Link to="/mispublicaciones" className="btn btn-primary w-full gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -59,15 +56,13 @@ export default function MiPerfil() {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <Link
-              to="/mispublicaciones"
-              className="text-accent ml-1"
-            >
-              Mis Publicaciones
-            </Link>
-          </button>
+            <span>Mis Publicaciones</span>
+          </Link>
 
-          <button className="btn btn-outline btn-primary text-accent w-full gap-2">
+          <Link
+            to="/nuevo"
+            className="btn btn-outline btn-primary w-full gap-2"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -82,15 +77,8 @@ export default function MiPerfil() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            <Link
-              to="/nuevo"
-              className="text-accent ml-1"
-            >
-              Crear Publicación
-            </Link>
-          </button>
-
-          
+            <span>Crear Publicación</span>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,17 +1,41 @@
 import pool from "../config/db.js";
 
-export async function selectPublicacionesUser(userId, limit = 3, page = 1) {
+export async function selectPublicacionesUser(
+  userId,
+  limit = 3,
+  page = 1,
+  estado = ""
+) {
   try {
     const offset = (page - 1) * limit;
 
-    const totalQuery = `SELECT COUNT(*) FROM publicaciones WHERE usuario_id = $1;`;
-
-    const {rows: totalResult} = await pool.query(totalQuery, [userId]);
+    // Conteo total (con filtro opcional de estado)
+    const countConditions = ["usuario_id = $1"];
+    const countParams = [userId];
+    let paramIndex = 2;
+    if (estado && ["nuevo", "usado", "vendido"].includes(estado)) {
+      countConditions.push(`estado = $${paramIndex++}`);
+      countParams.push(estado);
+    }
+    const totalQuery = `SELECT COUNT(*) FROM publicaciones WHERE ${countConditions.join(
+      " AND "
+    )};`;
+    const { rows: totalResult } = await pool.query(totalQuery, countParams);
 
     const total_rows = parseInt(totalResult[0].count, 10);
     const total_pages = Math.ceil(total_rows / limit);
 
     // Obtener las publicaciones paginadas con JOIN
+    // Query de publicaciones con filtro opcional
+    const pubConditions = ["p.usuario_id = $1"];
+    const pubParams = [userId];
+    paramIndex = 2;
+    if (estado && ["nuevo", "usado", "vendido"].includes(estado)) {
+      pubConditions.push(`p.estado = $${paramIndex++}`);
+      pubParams.push(estado);
+    }
+    pubParams.push(limit, offset); // para LIMIT y OFFSET
+
     const query = `
       SELECT 
         p.id,
@@ -23,17 +47,12 @@ export async function selectPublicacionesUser(userId, limit = 3, page = 1) {
         c.nombre AS categoria
       FROM publicaciones p
       INNER JOIN categorias c ON p.categoria_id = c.id
-      WHERE p.usuario_id = $1
+      WHERE ${pubConditions.join(" AND ")}
       ORDER BY p.fecha_creacion DESC
-      LIMIT $2 OFFSET $3;
+      LIMIT $${pubParams.length - 1} OFFSET $${pubParams.length};
     `;
-    const publicacionesResult = await pool.query(query, [
-      userId,
-      limit,
-      offset,
-    ]);
+    const publicacionesResult = await pool.query(query, pubParams);
     const publicaciones = publicacionesResult.rows;
-
 
     // Información del usuario
     const userQuery = `
@@ -53,7 +72,6 @@ export async function selectPublicacionesUser(userId, limit = 3, page = 1) {
       limit,
       publicaciones,
     };
-
   } catch (error) {
     console.error("❌ Error ejecutando selectPublicacionesUser:", error);
   }

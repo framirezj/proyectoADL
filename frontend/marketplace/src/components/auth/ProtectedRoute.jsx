@@ -1,8 +1,15 @@
 // components/ProtectedRoute.jsx
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-const ProtectedRoute = ({ children, requireAuth = true }) => {
+// redirectIfAuth: adónde enviar si el usuario autenticado accede a una ruta solo para invitados
+// redirectIfUnauth: adónde enviar si el usuario NO autenticado accede a una ruta protegida
+const ProtectedRoute = ({
+  children,
+  requireAuth = true,
+  redirectIfAuth = "/miperfil",
+  redirectIfUnauth = "/login",
+}) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
@@ -20,14 +27,13 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
 
   // Si la ruta requiere autenticación y el usuario no está autenticado
   if (requireAuth && !isAuthenticated) {
-    // Redirigir al login guardando la ubicación actual para volver después
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Navigate to={redirectIfUnauth} state={{ from: location }} replace />
+    );
   }
 
-  // Si la ruta es para usuarios NO autenticados (como login) y el usuario SÍ está autenticado
   if (!requireAuth && isAuthenticated) {
-    // Redirigir al dashboard o página principal
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={redirectIfAuth} replace />;
   }
 
   // Si pasa todas las validaciones, renderizar los children
