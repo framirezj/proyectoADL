@@ -14,7 +14,7 @@ export async function getMe(req, res) {
 
 export async function getPublicacionesUser(req, res) {
   try {
-    const { limit, page = 1,  } = req.query;
+    const { limit, page = 1, estado } = req.query;
     // Utilizar una expresión regular para verificar si 'page' es un número válido
     const isPageValid = /^[1-9]\d*$/.test(page);
 
@@ -27,7 +27,13 @@ export async function getPublicacionesUser(req, res) {
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
-    const data = await publicacionesUser(parseInt(req.user.userId), baseUrl, limit, page);
+    const data = await publicacionesUser(
+      parseInt(req.user.userId),
+      baseUrl,
+      limit,
+      page,
+      estado
+    );
     if (!data) {
       return res.status(404).json({ error: "Recurso no encontrado" });
     }

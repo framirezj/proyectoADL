@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCategories } from "../context/CategoriaContext.jsx";
 import api from "../api/axiosConfig.js";
 import Spinner from "../components/Spinner.jsx";
 import { showSuccess } from "../util/toast.js";
-
+import { formatPesos } from "../util/format.js";
 export default function ProductoForm() {
   // Estados
   const [formData, setFormData] = useState({
@@ -19,7 +19,9 @@ export default function ProductoForm() {
   const [error, setError] = useState("");
   const [previewImage, setPreviewImage] = useState("");
   const navigate = useNavigate();
-
+  const params = useParams();
+  const productoId = params.id;
+  const isEdit = Boolean(productoId);
   const {
     categories,
     loading: categoriesLoading,
@@ -29,13 +31,71 @@ export default function ProductoForm() {
 
   const safeCategories = Array.isArray(categories) ? categories : [];
 
+  // Si estamos en modo edición, cargar datos del producto
+  useEffect(() => {
+    if (!isEdit) return;
+
+    let mounted = true;
+
+    const fetchProducto = async () => {
+      try {
+        setLoading(true);
+        const resp = await api.get(`/producto/${productoId}`);
+        const data = resp.data || {};
+
+        if (!mounted) return;
+
+        setFormData((prev) => ({
+          ...prev,
+          titulo: data.titulo || "",
+          categoria: data.categoria_id || data.categoria || "",
+          precio: data.precio !== undefined ? String(data.precio) : "",
+          descripcion: data.descripcion || "",
+          condicion: data.estado || data.condicion || "",
+          imagen: null,
+        }));
+
+        if (data.imagen) setPreviewImage(data.imagen);
+      } catch (err) {
+        console.error("Error cargando producto:", err);
+        setError("No se pudo cargar el producto para editar");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchProducto();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isEdit, productoId]);
+
   // Manejar cambios de input
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
     if (type === "file") {
       const file = files[0];
-      setFormData((prevState) => ({ ...prevState, [name]: file }));
+      // Validación de archivo (tipo y tamaño)
+      if (file) {
+        const isImage = file.type.startsWith("image/");
+        const isUnder5MB = file.size <= 5 * 1024 * 1024;
+        if (!isImage) {
+          setError("El archivo debe ser una imagen válida (JPG, PNG, GIF)");
+          setFormData((prevState) => ({ ...prevState, [name]: null }));
+          setPreviewImage("");
+          return;
+        }
+        if (!isUnder5MB) {
+          setError("La imagen debe pesar menos de 5MB");
+          setFormData((prevState) => ({ ...prevState, [name]: null }));
+          setPreviewImage("");
+          return;
+        }
+      }
+
+      setFormData((prevState) => ({ ...prevState, [name]: file || null }));
 
       // Crear preview
       if (file) {
@@ -46,7 +106,13 @@ export default function ProductoForm() {
         setPreviewImage("");
       }
     } else {
-      setFormData((prevState) => ({ ...prevState, [name]: value }));
+      if (name === "precio") {
+        // Solo números enteros (CLP), sin puntos ni comas
+        const sanitized = value.replace(/\D/g, "");
+        setFormData((prevState) => ({ ...prevState, [name]: sanitized }));
+      } else {
+        setFormData((prevState) => ({ ...prevState, [name]: value }));
+      }
     }
 
     if (error) setError("");
@@ -59,8 +125,21 @@ export default function ProductoForm() {
     setError("");
 
     // Validaciones básicas
-    if (!formData.titulo.trim()) {
+    const tituloTrim = formData.titulo.trim();
+    const descripcionTrim = formData.descripcion.trim();
+
+    if (!tituloTrim) {
       setError("El título del producto es requerido");
+      setLoading(false);
+      return;
+    }
+    if (tituloTrim.length < 5) {
+      setError("El título debe tener al menos 5 caracteres");
+      setLoading(false);
+      return;
+    }
+    if (tituloTrim.length > 40) {
+      setError("El título no puede superar 40 caracteres");
       setLoading(false);
       return;
     }
@@ -69,13 +148,23 @@ export default function ProductoForm() {
       setLoading(false);
       return;
     }
-    if (!formData.precio || parseFloat(formData.precio) <= 0) {
-      setError("El precio debe ser mayor a 0");
+    if (!formData.precio || parseInt(formData.precio, 10) <= 0) {
+      setError("El precio debe ser un número entero mayor a 0");
       setLoading(false);
       return;
     }
-    if (!formData.descripcion.trim()) {
+    if (!descripcionTrim) {
       setError("La descripción del producto es requerida");
+      setLoading(false);
+      return;
+    }
+    if (descripcionTrim.length < 10) {
+      setError("La descripción debe tener al menos 10 caracteres");
+      setLoading(false);
+      return;
+    }
+    if (descripcionTrim.length > 1000) {
+      setError("La descripción no puede superar 1000 caracteres");
       setLoading(false);
       return;
     }
@@ -85,22 +174,38 @@ export default function ProductoForm() {
       return;
     }
 
+    // Imagen obligatoria solo al crear
+    if (!isEdit && !formData.imagen) {
+      setError("Debes adjuntar una imagen del producto");
+      setLoading(false);
+      return;
+    }
+
     try {
       const submitData = new FormData();
       submitData.append("titulo", formData.titulo);
       submitData.append("categoria", formData.categoria);
-      submitData.append("precio", parseFloat(formData.precio));
+      submitData.append("precio", parseInt(formData.precio, 10));
       submitData.append("descripcion", formData.descripcion);
       submitData.append("condicion", formData.condicion);
       if (formData.imagen) submitData.append("imagen", formData.imagen);
 
-      const response = await api.post("/producto/nuevo", submitData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (response.status === 201) {
-        showSuccess("Producto publicado exitosamente!");
-        navigate("/mispublicaciones");
+      if (isEdit) {
+        const putResp = await api.put(`/producto/${productoId}`, submitData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (putResp.status === 200) {
+          showSuccess("Producto actualizado exitosamente!");
+          navigate("/mispublicaciones");
+        }
+      } else {
+        const response = await api.post("/producto/nuevo", submitData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (response.status === 201) {
+          showSuccess("Producto publicado exitosamente!");
+          navigate("/mispublicaciones");
+        }
       }
     } catch (error) {
       console.error("Error al publicar producto:", error);
@@ -163,7 +268,7 @@ export default function ProductoForm() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-base-content mb-3">
-            Publicar Nuevo Producto
+            {isEdit ? "Editar Producto" : "Publicar Nuevo Producto"}
           </h1>
           <p className="text-lg text-base-content/70">
             Completa la información de tu producto para comenzar a vender
@@ -207,8 +312,15 @@ export default function ProductoForm() {
                   placeholder="Ej: iPhone 13 Pro Max 256GB en perfecto estado"
                   value={formData.titulo}
                   onChange={handleChange}
+                  minLength={5}
+                  maxLength={40}
                   required
                 />
+                <label className="label">
+                  <span className="label-text-alt text-base-content/60">
+                    Mínimo 5 y máximo 40 caracteres
+                  </span>
+                </label>
               </div>
 
               {/* Categoría y Precio */}
@@ -257,17 +369,42 @@ export default function ProductoForm() {
                       $
                     </span>
                     <input
-                      type="number"
+                      type="text"
                       name="precio"
                       className="input input-bordered input-lg w-full pl-12 focus:input-primary"
-                      placeholder="0.00"
-                      step="0.01"
-                      min="0"
+                      placeholder="0"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      autoComplete="off"
                       value={formData.precio}
                       onChange={handleChange}
+                      onPaste={(e) => {
+                        const text = (
+                          e.clipboardData || window.clipboardData
+                        ).getData("text");
+                        if (/[^\d]/.test(text)) {
+                          e.preventDefault();
+                          const onlyDigits = text.replace(/\D/g, "");
+                          setFormData((prev) => ({
+                            ...prev,
+                            precio: onlyDigits,
+                          }));
+                        }
+                      }}
+                      onInvalid={(e) =>
+                        e.currentTarget.setCustomValidity(
+                          "Ingresa solo números, sin puntos ni comas"
+                        )
+                      }
+                      onInput={(e) => e.currentTarget.setCustomValidity("")}
                       required
                     />
                   </div>
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">
+                      Vista previa: ${formatPesos(formData.precio || 0)}
+                    </span>
+                  </label>
                 </div>
               </div>
 
@@ -284,8 +421,15 @@ export default function ProductoForm() {
                   placeholder="Describe tu producto en detalle..."
                   value={formData.descripcion}
                   onChange={handleChange}
+                  minLength={10}
+                  maxLength={1000}
                   required
                 ></textarea>
+                <label className="label">
+                  <span className="label-text-alt text-base-content/60">
+                    Mínimo 10 y máximo 1000 caracteres
+                  </span>
+                </label>
               </div>
 
               {/* Imagen */}
@@ -302,10 +446,16 @@ export default function ProductoForm() {
                     className="file-input file-input-bordered file-input-primary w-full max-w-xs mx-auto mb-4"
                     accept="image/*"
                     onChange={handleChange}
+                    required={!isEdit}
                   />
                   <p className="text-sm text-base-content/60">
                     Formatos: JPG, PNG, GIF • Máximo 5MB
                   </p>
+                  {isEdit && !previewImage && (
+                    <p className="text-xs text-base-content/50 mt-1">
+                      Si no subes una nueva imagen, se mantendrá la actual.
+                    </p>
+                  )}
 
                   {previewImage && (
                     <div className="mt-4">
@@ -383,6 +533,8 @@ export default function ProductoForm() {
                 >
                   {loading ? (
                     <span className="loading loading-spinner text-primary"></span>
+                  ) : isEdit ? (
+                    "Guardar Cambios"
                   ) : (
                     "Publicar Producto"
                   )}

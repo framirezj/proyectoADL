@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../api/axiosConfig";
 import Spinner from "../components/Spinner";
 import Pagination from "../components/Pagination";
+import { formatPesos } from "../util/format";
+import { showSuccess, showError } from "../util/toast";
+import { useAuth } from "../context/AuthContext";
+import { useCategories } from "../context/CategoriaContext";
 
 export default function MisPublicaciones() {
+  const { user } = useAuth();
+  const { categories } = useCategories();
   const [publicaciones, setPublicaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,17 +19,42 @@ export default function MisPublicaciones() {
   const [limit, setLimit] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
+  const [estadoFilter, setEstadoFilter] = useState("todos");
 
   const handleDelete = async (productoId) => {
     try {
       await api.delete(`/producto/${productoId}`);
 
-      // actulizar la lista
-      setPublicaciones((prevPublicaciones) =>
-        prevPublicaciones.filter((item) => item.id !== productoId)
-      );
+      setPublicaciones((prev) => prev.filter((item) => item.id !== productoId));
+
+      // Si era el último de la página y no es la primera, retroceder página
+      const isLastItemOnPage = publicaciones.length <= 1;
+      const targetPage = isLastItemOnPage && page > 1 ? page - 1 : page;
+
+      if (targetPage !== page) {
+        setPage(targetPage); // useEffect disparará el refetch
+      } else {
+        // Re-fetch para actualizar totales y datos
+        await fetchPublicaciones(targetPage, limit);
+      }
+
+      showSuccess("Publicación eliminada");
     } catch (error) {
       console.error("Error eliminando producto:", error);
+      showError("No se pudo eliminar la publicación");
+    }
+  };
+
+  const handleMarkSold = async (productoId) => {
+    try {
+      await api.put(`/producto/${productoId}`, { condicion: "vendido" });
+      setPublicaciones((prev) =>
+        prev.map((p) => (p.id === productoId ? { ...p, estado: "vendido" } : p))
+      );
+      showSuccess("Publicación marcada como vendida");
+    } catch (error) {
+      console.error("Error marcando como vendido:", error);
+      showError("No se pudo marcar como vendido");
     }
   };
 
@@ -31,6 +62,7 @@ export default function MisPublicaciones() {
     const config = {
       nuevo: { clase: "badge-success", texto: "Nuevo" },
       usado: { clase: "badge-warning", texto: "Usado" },
+      vendido: { clase: "badge-error", texto: "Vendido" },
     };
 
     const { clase, texto } = config[condicion];
@@ -78,12 +110,14 @@ export default function MisPublicaciones() {
         {publicaciones.map((publicacion) => (
           <div
             key={publicacion.id}
-            className="bg-base-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className={`bg-base-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+              publicacion.estado === "vendido" ? "opacity-80" : ""
+            }`}
           >
             <div className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                 {/* Imagen del producto */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {publicacion.imagen ? (
                     <img
                       src={publicacion.imagen}
@@ -98,7 +132,7 @@ export default function MisPublicaciones() {
                 </div>
 
                 {/* Información principal */}
-                <div className="flex-grow">
+                <div className="grow">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
                     <div>
                       <h3 className="text-xl font-bold text-base-content mb-1">
@@ -106,7 +140,13 @@ export default function MisPublicaciones() {
                       </h3>
                       <div className="flex items-center space-x-4 mb-2">
                         <span className="text-base-content/70 text-sm">
-                          {publicacion.categoria}
+                          {publicacion.categoria ||
+                            (Array.isArray(categories)
+                              ? categories.find(
+                                  (c) => c.id === publicacion.categoria_id
+                                )?.nombre
+                              : undefined) ||
+                            "Sin categoría"}
                         </span>
                         {getEstadoBadge(publicacion.estado)}
                       </div>
@@ -114,7 +154,7 @@ export default function MisPublicaciones() {
 
                     <div className="mt-4 lg:mt-0 lg:text-right">
                       <div className="text-3xl font-bold text-primary mb-2">
-                        ${publicacion.precio}
+                        ${formatPesos(publicacion.precio)}
                       </div>
                     </div>
                   </div>
@@ -122,6 +162,41 @@ export default function MisPublicaciones() {
                   {/* Acciones */}
                   <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
                     <div className="flex flex-wrap gap-2">
+                      {publicacion.estado !== "vendido" && (
+                        <button
+                          className="btn btn-outline btn-warning btn-sm gap-2"
+                          onClick={() => handleMarkSold(publicacion.id)}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Marcar vendido
+                        </button>
+                      )}
+                      <Link
+                        to={`/editar/${publicacion.id}`}
+                        className="btn btn-outline btn-primary btn-sm gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                        </svg>
+                        Editar
+                      </Link>
+
                       <button
                         className="btn btn-outline btn-error btn-sm gap-2"
                         onClick={() => handleDelete(publicacion.id)}
@@ -160,35 +235,55 @@ export default function MisPublicaciones() {
     );
   };
 
-  const fetchPublicaciones = async (page = 1, limit = 3) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      // 🔹 Llamada a tu API
-      const response = await api.get(
-        `/usuarios/publicaciones?limit=${limit}&page=${page}`
-      );
-
-      const data = response.data;
-      // 🔹 Extraer solo el array de publicaciones
-      setPublicaciones(data.publicaciones || []);
-      setTotalRows(Number(data.total_publicaciones));
-      setTotalPages(Number(data.total_pages));
-      setLimit(Number(data.limit));
-      setPage(Number(data.page));
-    } catch (err) {
-      console.error(err);
-      setError("Error al cargar las publicaciones");
-      setPublicaciones([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchPublicaciones = useCallback(
+    async (page = 1, limit = 3, estado = estadoFilter) => {
+      try {
+        setLoading(true);
+        setError(null);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 🔹 Llamada a la API
+        let data;
+        if (user?.rol === "admin") {
+          const res = await api.get(
+            `/producto?limit=${limit}&page=${page}$${""}`.replace(
+              "$",
+              estado && estado !== "todos" ? `&estado=${estado}` : ""
+            )
+          );
+          data = res.data;
+          setPublicaciones(data.publicaciones || []);
+          setTotalRows(Number(data.total_rows));
+          setTotalPages(Number(data.total_pages));
+          setLimit(Number(data.limit));
+          setPage(Number(data.page));
+        } else {
+          const res = await api.get(
+            `/usuarios/publicaciones?limit=${limit}&page=${page}$${""}`.replace(
+              "$",
+              estado && estado !== "todos" ? `&estado=${estado}` : ""
+            )
+          );
+          data = res.data;
+          setPublicaciones(data.publicaciones || []);
+          setTotalRows(Number(data.total_publicaciones));
+          setTotalPages(Number(data.total_pages));
+          setLimit(Number(data.limit));
+          setPage(Number(data.page));
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar las publicaciones");
+        setPublicaciones([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user?.rol, estadoFilter]
+  );
 
   useEffect(() => {
-    fetchPublicaciones(page, limit);
-  }, [page]);
+    fetchPublicaciones(page, limit, estadoFilter);
+  }, [page, limit, user?.rol, estadoFilter, fetchPublicaciones]);
 
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
@@ -198,7 +293,9 @@ export default function MisPublicaciones() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="mb-6 lg:mb-0">
               <h1 className="text-4xl font-bold text-base-content mb-2">
-                Mis Publicaciones
+                {user?.rol === "admin"
+                  ? "Todas las Publicaciones"
+                  : "Mis Publicaciones"}
               </h1>
               <p className="text-base-content/70 text-lg">
                 Gestiona y revisa el rendimiento de tus productos publicados
@@ -217,8 +314,32 @@ export default function MisPublicaciones() {
           </div>
         </div>
 
-        {/* Botón de nueva publicación */}
-        <div className="flex justify-end mt-4 mb-8">
+        {/* Filtros + Botón de nueva publicación */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mt-4 mb-8">
+          {/* Filtro estado */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "Todos", value: "todos" },
+              { label: "Nuevo", value: "nuevo" },
+              { label: "Usado", value: "usado" },
+              { label: "Vendido", value: "vendido" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  setPage(1);
+                  setEstadoFilter(opt.value);
+                }}
+                className={`btn btn-sm ${
+                  estadoFilter === opt.value
+                    ? "btn-primary"
+                    : "btn-outline btn-primary"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
           <Link to="/nuevo" className="btn btn-primary btn-lg gap-3 px-8">
             <svg
               xmlns="http://www.w3.org/2000/svg"

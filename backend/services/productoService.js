@@ -4,6 +4,8 @@ import {
   selectProductos,
   selectProducto,
   selectPublicacionesRandom as selectRandom,
+  updateProducto as modelUpdateProducto,
+  markProductosVendidos,
 } from "../models/productoModel.js";
 
 export async function crearProducto(data) {
@@ -29,16 +31,66 @@ export async function crearProducto(data) {
   return nuevoProducto;
 }
 
-export async function borrarProducto(productoId) {
-  return await deleteProducto(productoId);
+export async function borrarProducto(productoId, user) {
+  // Verificar existencia y permisos
+  const producto = await selectProducto(productoId);
+  if (!producto) {
+    const err = new Error("Producto no encontrado");
+    err.status = 404;
+    throw err;
+  }
+
+  // Solo el dueño (usuario_id) o admin puede borrar
+  if (producto.usuario_id !== user.userId && user.role !== "admin") {
+    const err = new Error("No tienes permisos para borrar este producto");
+    err.status = 403;
+    throw err;
+  }
+
+  await deleteProducto(productoId);
+  return true;
+}
+
+export async function actualizarProducto(productoId, data, user) {
+  // Verificar existencia y permisos
+  const producto = await selectProducto(productoId);
+  if (!producto) throw new Error("Producto no encontrado");
+
+  // Solo el dueño (usuario_id) o admin puede actualizar
+  if (producto.usuario_id !== user.userId && user.role !== "admin") {
+    const err = new Error("No tienes permisos para editar este producto");
+    err.status = 403;
+    throw err;
+  }
+
+  // Preparar datos para modelo
+  const { titulo, categoria, condicion, descripcion, precio, imagen } = data;
+
+  const updated = await modelUpdateProducto({
+    productoId,
+    titulo,
+    categoria,
+    condicion,
+    descripcion,
+    precio,
+    imagen,
+  });
+
+  return updated;
 }
 
 export async function obtenerPublicaciones(
   /* baseUrl */
-  { limit, order, page, categoria },
+  { limit, order, page, categoria, estado },
   request
 ) {
-  const result = await selectProductos({ limit, order, page, categoria });
+  const result = await selectProductos({
+    limit,
+    order,
+    page,
+    categoria,
+    estado,
+  });
 
   const baseUrl = request ? `${new URL(request.url).origin}` : "";
 
@@ -52,13 +104,13 @@ export async function obtenerPublicaciones(
         ? null
         : `${baseUrl}/api/producto?limit=${result.limit}&page=${
             Number(result.page) + 1
-          }`,
+          }${estado ? `&estado=${estado}` : ""}`,
     previous:
       result.page <= 1
         ? null
         : `${baseUrl}/api/producto?limit=${result.limit}&page=${
             Number(result.page) - 1
-          }`,
+          }${estado ? `&estado=${estado}` : ""}`,
     publicaciones: result.publicaciones.map((producto) => ({
       ...producto,
       imagen: producto.url_imagen || null,
@@ -90,4 +142,32 @@ export async function obtenerPublicacionesRandom() {
       imagen: producto.url_imagen || null,
     })),
   };
+}
+
+export async function checkoutMarcarVendidos(ids, user) {
+  // Requiere autenticación, pero no requiere ser dueño: es una operación de compra
+  if (!user || !user.userId) {
+    const err = new Error("No autenticado");
+    err.status = 401;
+    throw err;
+  }
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    const err = new Error("Debe enviar una lista de IDs de productos");
+    err.status = 400;
+    throw err;
+  }
+
+  const cleanIds = ids
+    .map((v) => Number(v))
+    .filter((n) => Number.isInteger(n) && n > 0);
+
+  if (cleanIds.length === 0) {
+    const err = new Error("IDs de productos inválidos");
+    err.status = 400;
+    throw err;
+  }
+
+  const updatedIds = await markProductosVendidos(cleanIds);
+  return { updatedCount: updatedIds.length, updatedIds };
 }

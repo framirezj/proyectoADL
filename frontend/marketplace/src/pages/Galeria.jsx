@@ -12,6 +12,7 @@ const ProductGallery = () => {
   const { addToCart, isInCart } = useCart();
   const [selectedCategory, setSelectedCategory] = useState(0);
   const [products, setProducts] = useState([]);
+  const [estadoFilter, setEstadoFilter] = useState("todos");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
@@ -67,10 +68,12 @@ const ProductGallery = () => {
           {products.map((product) => (
             <div
               key={product.id}
-              className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
+              className={`card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 ${
+                product.estado === "vendido" ? "opacity-80" : ""
+              }`}
             >
               <figure
-                className="px-4 pt-4 cursor-pointer group"
+                className="px-4 pt-4 cursor-pointer group relative"
                 onClick={() => handleDetails(product.id)}
               >
                 <img
@@ -78,14 +81,34 @@ const ProductGallery = () => {
                   alt={product.titulo}
                   className="rounded-xl h-48 w-full object-cover"
                 />
+                {product.estado === "vendido" && (
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
+                    <span className="badge badge-error text-white badge-lg">
+                      Vendido
+                    </span>
+                  </div>
+                )}
               </figure>
               <div className="card-body">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="card-title text-lg">{product.titulo}</h3>
-                  <div className="badge badge-secondary">
-                    {safeCategories.find(
-                      (cat) => cat.id === product.categoria_id
-                    )?.nombre || "Sin categoría"}
+                  <div className="flex items-center gap-2">
+                    <div className="badge badge-secondary">
+                      {safeCategories.find(
+                        (cat) => cat.id === product.categoria_id
+                      )?.nombre || "Sin categoría"}
+                    </div>
+                    {product.estado && (
+                      <span
+                        className={`badge ${
+                          product.estado === "nuevo"
+                            ? "badge-success"
+                            : "badge-warning"
+                        } badge-outline text-white font-semibold`}
+                      >
+                        {product.estado === "nuevo" ? "Nuevo" : "Usado"}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <p className="text-base-content/70 text-sm mb-4">
@@ -95,15 +118,21 @@ const ProductGallery = () => {
                   <span className="text-2xl font-bold text-primary">
                     ${formatPesos(product.precio)}
                   </span>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => addToCart(product)}
-                    disabled={isInCart(product.id)}
-                  >
-                    {isInCart(product.id)
-                      ? "En el carrito"
-                      : "Agregar al carrito"}
-                  </button>
+                  {product.estado === "vendido" ? (
+                    <span className="badge badge-error text-white">
+                      Vendido
+                    </span>
+                  ) : (
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => addToCart(product)}
+                      disabled={isInCart(product.id)}
+                    >
+                      {isInCart(product.id)
+                        ? "En el carrito"
+                        : "Agregar al carrito"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -119,13 +148,21 @@ const ProductGallery = () => {
     );
   };
 
-  const fetchPublicaciones = async (page = 1, limit = 6, categoria) => {
+  const fetchPublicaciones = async (
+    page = 1,
+    limit = 6,
+    categoria,
+    estado = estadoFilter
+  ) => {
     setLoading(true);
     setError(null);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
       const response = await api.get(
-        `/producto?limit=${limit}&page=${page}&categoria=${categoria}`
+        `/producto?limit=${limit}&page=${page}&categoria=${categoria}$${""}`.replace(
+          "$",
+          estado && estado !== "todos" ? `&estado=${estado}` : ""
+        )
       );
       const data = response.data;
       setProducts(data.publicaciones || []);
@@ -143,12 +180,15 @@ const ProductGallery = () => {
   };
 
   useEffect(() => {
-    fetchPublicaciones(page, limit, selectedCategory);
-  }, [page, limit, selectedCategory]);
+    fetchPublicaciones(page, limit, selectedCategory, estadoFilter);
+  }, [page, limit, selectedCategory, estadoFilter]);
 
   useEffect(() => {
     setPage(1);
   }, [selectedCategory]);
+  useEffect(() => {
+    setPage(1);
+  }, [estadoFilter]);
 
   const safeCategories = Array.isArray(categories) ? categories : [];
 
@@ -164,35 +204,61 @@ const ProductGallery = () => {
           <div className="lg:w-1/4">
             <div className="bg-base-100 rounded-lg shadow-lg p-6 sticky top-6">
               <h2 className="text-xl font-semibold mb-4 text-secondary">
-                Categorías
+                Filtros
               </h2>
 
               {loadingCategorias ? (
                 <Spinner />
               ) : safeCategories.length > 0 ? (
-                <div className="space-y-2">
-                  <button
-                    className={`btn btn-block justify-start ${
-                      selectedCategory === 0 ? "btn-primary" : "btn-ghost"
-                    }`}
-                    onClick={() => setSelectedCategory(0)}
-                  >
-                    Todos
-                  </button>
-
-                  {safeCategories.map((category) => (
+                <div className="space-y-4">
+                  {/* Categorías */}
+                  <div className="divider mb-2">Categorías</div>
+                  <div className="space-y-2">
                     <button
-                      key={category.id}
                       className={`btn btn-block justify-start ${
-                        selectedCategory === category.id
-                          ? "btn-primary"
-                          : "btn-ghost"
+                        selectedCategory === 0 ? "btn-primary" : "btn-ghost"
                       }`}
-                      onClick={() => setSelectedCategory(category.id)}
+                      onClick={() => setSelectedCategory(0)}
                     >
-                      {category.nombre}
+                      Todas
                     </button>
-                  ))}
+                    {safeCategories.map((category) => (
+                      <button
+                        key={category.id}
+                        className={`btn btn-block justify-start ${
+                          selectedCategory === category.id
+                            ? "btn-primary"
+                            : "btn-ghost"
+                        }`}
+                        onClick={() => setSelectedCategory(category.id)}
+                      >
+                        {category.nombre}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Divisor con texto */}
+                  <div className="divider my-2">Estado</div>
+                  {/* Estado */}
+                  <div className="space-y-2">
+                    {[
+                      { label: "Todos", value: "todos" },
+                      { label: "Nuevo", value: "nuevo" },
+                      { label: "Usado", value: "usado" },
+                      { label: "Vendido", value: "vendido" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        className={`btn btn-block justify-start ${
+                          estadoFilter === opt.value
+                            ? "btn-primary"
+                            : "btn-ghost"
+                        }`}
+                        onClick={() => setEstadoFilter(opt.value)}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <p className="text-sm text-base-content/60">
@@ -202,10 +268,18 @@ const ProductGallery = () => {
 
               {/* Información del filtro activo */}
               <div className="mt-6 p-4 bg-info text-info-content rounded-lg">
-                <p className="font-semibold">Filtro activo:</p>
+                <p className="font-semibold">Filtros activos:</p>
                 <p className="text-lg">
+                  Categoría:{" "}
                   {safeCategories.find((cat) => cat.id === selectedCategory)
-                    ?.nombre || "Todos"}
+                    ?.nombre || "Todas"}
+                </p>
+                <p className="text-lg">
+                  Estado:{" "}
+                  {estadoFilter === "todos"
+                    ? "Todos"
+                    : estadoFilter.charAt(0).toUpperCase() +
+                      estadoFilter.slice(1)}
                 </p>
                 <p className="text-sm mt-2">
                   {totalRows} producto{products.length !== 1 ? "s" : ""}{" "}
