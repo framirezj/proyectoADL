@@ -79,10 +79,11 @@ export async function selectProductos({
   const queryParams = [...params, limit, offset];
 
   const query = `
-    SELECT *
-    FROM publicaciones
+    SELECT p.*, u.username AS autor_username, u.nombre AS autor_nombre
+    FROM publicaciones p
+    JOIN usuarios u ON p.usuario_id = u.id
     ${whereClause}
-    ORDER BY id ${order}
+    ORDER BY p.id ${order}
     LIMIT $${params.length + 1}
     OFFSET $${params.length + 2};
   `;
@@ -100,7 +101,10 @@ export async function selectProductos({
 
 export async function selectProducto(productoId) {
   const query = `
-    SELECT * FROM publicaciones WHERE id = $1;
+    SELECT p.*, u.username AS autor_username, u.nombre AS autor_nombre
+    FROM publicaciones p
+    JOIN usuarios u ON p.usuario_id = u.id
+    WHERE p.id = $1;
   `;
   const values = [productoId];
 
@@ -111,8 +115,10 @@ export async function selectProducto(productoId) {
 
 export async function selectPublicacionesRandom() {
   const query = `
-    SELECT * FROM publicaciones 
-    ORDER BY RANDOM() 
+    SELECT p.*, u.username AS autor_username, u.nombre AS autor_nombre
+    FROM publicaciones p
+    JOIN usuarios u ON p.usuario_id = u.id
+    ORDER BY RANDOM()
     LIMIT 9;
   `;
   const { rows } = await pool.query(query);

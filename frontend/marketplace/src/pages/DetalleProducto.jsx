@@ -243,6 +243,12 @@ export default function ProductDetail() {
                       </span>
                     )}
                   </div>
+                  {(product.autor_username || product.autor_nombre) && (
+                    <p className="text-sm text-base-content/60 mt-2">
+                      Publicado por: {product.autor_username}
+                      {product.autor_nombre ? ` (${product.autor_nombre})` : ""}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
