@@ -26,6 +26,7 @@ export default function ProductoForm() {
     categories,
     loading: categoriesLoading,
     error: categoriesError,
+    refreshCategories,
   } = useCategories();
 
   const safeCategories = Array.isArray(categories) ? categories : [];
@@ -226,6 +227,41 @@ export default function ProductoForm() {
   // ==========================
   // Render
   // ==========================
+
+  // Renderizado condicional mientras cargan las categorías
+  if (categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-base-200 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (categoriesError) {
+    return (
+      <div className="min-h-screen bg-base-200 flex items-center justify-center text-center">
+        <div className="max-w-md p-8 bg-base-100 rounded-2xl shadow-xl">
+          <h2 className="text-2xl font-bold text-error mb-4">
+            Error Crítico
+          </h2>
+          <p className="text-base-content/80 mb-6">
+            No se pudieron cargar las categorías, que son esenciales para
+            publicar un producto. Por favor, revisa tu conexión o intenta de
+            nuevo.
+          </p>
+          <div className="space-x-4">
+            <button onClick={() => navigate(-1)} className="btn btn-outline">
+              Volver
+            </button>
+            <button onClick={() => refreshCategories()} className="btn btn-primary">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -296,13 +332,7 @@ export default function ProductoForm() {
                       Categoría
                     </span>
                   </label>
-                  {categoriesLoading ? (
-                    <Spinner />
-                  ) : categoriesError ? (
-                    <p className="text-sm text-error">
-                      Error al cargar categorías
-                    </p>
-                  ) : safeCategories.length > 0 ? (
+                  {safeCategories.length > 0 ? (
                     <select
                       name="categoria"
                       className="select select-bordered select-lg w-full focus:select-primary"
@@ -310,7 +340,9 @@ export default function ProductoForm() {
                       onChange={handleChange}
                       required
                     >
-                      <option value="">Selecciona una categoría</option>
+                      <option value="" disabled>
+                        Selecciona una categoría
+                      </option>
                       {safeCategories.map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.nombre}
@@ -319,7 +351,8 @@ export default function ProductoForm() {
                     </select>
                   ) : (
                     <p className="text-sm text-base-content/60">
-                      No hay categorías disponibles
+                      No hay categorías disponibles. Agrega una para poder
+                      publicar.
                     </p>
                   )}
                 </div>
@@ -496,7 +529,7 @@ export default function ProductoForm() {
                 <button
                   type="submit"
                   className="btn btn-primary btn-lg flex-1 gap-2 shadow-lg"
-                  disabled={loading}
+                  disabled={loading || safeCategories.length === 0}
                 >
                   {loading ? (
                     <span className="loading loading-spinner text-primary"></span>
