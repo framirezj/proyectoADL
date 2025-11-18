@@ -111,6 +111,12 @@ const ProductGallery = () => {
                     )}
                   </div>
                 </div>
+                {(product.autor_username || product.autor_nombre) && (
+                  <p className="text-xs text-base-content/60 -mt-1 mb-2">
+                    Publicado por: {product.autor_username}
+                    {product.autor_nombre ? ` (${product.autor_nombre})` : ""}
+                  </p>
+                )}
                 <p className="text-base-content/70 text-sm mb-4">
                   {product.description}
                 </p>
