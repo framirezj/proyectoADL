@@ -5,7 +5,6 @@ import api from "../api/axiosConfig.js";
 import Spinner from "../components/Spinner.jsx";
 import { showSuccess } from "../util/toast.js";
 import { formatPesos } from "../util/format.js";
-
 export default function ProductoForm() {
   // Estados
   const [formData, setFormData] = useState({
@@ -23,7 +22,6 @@ export default function ProductoForm() {
   const params = useParams();
   const productoId = params.id;
   const isEdit = Boolean(productoId);
-
   const {
     categories,
     loading: categoriesLoading,
@@ -343,7 +341,8 @@ export default function ProductoForm() {
                       className="input input-bordered input-lg w-full pl-12 focus:input-primary"
                       placeholder="0"
                       inputMode="numeric"
-                      pattern="\\d*"
+                      pattern="[0-9]*"
+                      autoComplete="off"
                       value={formData.precio}
                       onChange={handleChange}
                       onPaste={(e) => {
@@ -359,6 +358,12 @@ export default function ProductoForm() {
                           }));
                         }
                       }}
+                      onInvalid={(e) =>
+                        e.currentTarget.setCustomValidity(
+                          "Ingresa solo números, sin puntos ni comas"
+                        )
+                      }
+                      onInput={(e) => e.currentTarget.setCustomValidity("")}
                       required
                     />
                   </div>
