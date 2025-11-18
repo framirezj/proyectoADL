@@ -131,6 +131,12 @@ export default function Home() {
                     {product.titulo || "Producto sin título"}
                   </h2>
                 </div>
+                {(product.autor_username || product.autor_nombre) && (
+                  <p className="text-xs text-base-content/60 -mt-1 mb-2">
+                    Publicado por: {product.autor_username}
+                    {product.autor_nombre ? ` (${product.autor_nombre})` : ""}
+                  </p>
+                )}
                 <p className="text-base-content/70 mb-4 line-clamp-2">
                   {product.descripcion || "Sin descripción disponible"}
                 </p>
