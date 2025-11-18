@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../api/axiosConfig";
 
 // Crear el Context
 const AuthContext = createContext();
@@ -7,7 +8,7 @@ const AuthContext = createContext();
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+    throw new Error("useAuth debe ser usado dentro de un AuthProvider");
   }
   return context;
 };
@@ -21,15 +22,20 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (token) {
-          // Aquí puedes hacer una llamada a tu API para verificar el token
-          // y obtener los datos del usuario
-          const userData = JSON.parse(localStorage.getItem('user') || 'null');
-          setUser(userData);
+          // Verificar token con el backend y refrescar datos de usuario
+          const { data } = await api.get("/usuarios/me");
+          if (data) {
+            localStorage.setItem("user", JSON.stringify(data));
+            setUser(data);
+          } else {
+            // Si la respuesta no es válida, cerrar sesión
+            logout();
+          }
         }
       } catch (error) {
-        console.error('Error verificando autenticación:', error);
+        console.error("Error verificando autenticación:", error);
         logout();
       } finally {
         setLoading(false);
@@ -43,15 +49,15 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData, token) => {
     try {
       // Guardar en localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
+
       // Actualizar estado
       setUser(userData);
-      
+
       return { success: true };
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error("Error en login:", error);
       return { success: false, error: error.message };
     }
   };
@@ -59,9 +65,9 @@ export const AuthProvider = ({ children }) => {
   // Función para logout
   const logout = () => {
     // Limpiar localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
     // Actualizar estado
     setUser(null);
   };
@@ -70,7 +76,7 @@ export const AuthProvider = ({ children }) => {
   const updateUser = (updatedData) => {
     const updatedUser = { ...user, ...updatedData };
     setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
   // Valores que estarán disponibles en el Context
@@ -80,12 +86,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateUser,
     loading,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
