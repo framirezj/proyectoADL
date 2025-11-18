@@ -169,7 +169,7 @@ export default function Header({ logout, isAuthenticated }) {
               >
                 <ShoppingCart size={22} />
                 <span className="absolute -top-1 -right-1 bg-primary text-primary-content text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  0
+                  {getItemCount()}
                 </span>
               </Link>
 
