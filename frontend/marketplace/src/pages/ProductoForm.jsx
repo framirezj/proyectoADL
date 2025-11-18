@@ -77,7 +77,25 @@ export default function ProductoForm() {
 
     if (type === "file") {
       const file = files[0];
-      setFormData((prevState) => ({ ...prevState, [name]: file }));
+      // Validación de archivo (tipo y tamaño)
+      if (file) {
+        const isImage = file.type.startsWith("image/");
+        const isUnder5MB = file.size <= 5 * 1024 * 1024;
+        if (!isImage) {
+          setError("El archivo debe ser una imagen válida (JPG, PNG, GIF)");
+          setFormData((prevState) => ({ ...prevState, [name]: null }));
+          setPreviewImage("");
+          return;
+        }
+        if (!isUnder5MB) {
+          setError("La imagen debe pesar menos de 5MB");
+          setFormData((prevState) => ({ ...prevState, [name]: null }));
+          setPreviewImage("");
+          return;
+        }
+      }
+
+      setFormData((prevState) => ({ ...prevState, [name]: file || null }));
 
       // Crear preview
       if (file) {
@@ -123,6 +141,13 @@ export default function ProductoForm() {
     }
     if (!formData.condicion) {
       setError("Debes seleccionar la condición del producto");
+      setLoading(false);
+      return;
+    }
+
+    // Imagen obligatoria solo al crear
+    if (!isEdit && !formData.imagen) {
+      setError("Debes adjuntar una imagen del producto");
       setLoading(false);
       return;
     }
@@ -321,10 +346,16 @@ export default function ProductoForm() {
                     className="file-input file-input-bordered file-input-primary w-full max-w-xs mx-auto mb-4"
                     accept="image/*"
                     onChange={handleChange}
+                    required={!isEdit}
                   />
                   <p className="text-sm text-base-content/60">
                     Formatos: JPG, PNG, GIF • Máximo 5MB
                   </p>
+                  {isEdit && !previewImage && (
+                    <p className="text-xs text-base-content/50 mt-1">
+                      Si no subes una nueva imagen, se mantendrá la actual.
+                    </p>
+                  )}
 
                   {previewImage && (
                     <div className="mt-4">
