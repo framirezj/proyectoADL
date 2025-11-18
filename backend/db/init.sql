@@ -94,7 +94,7 @@ VALUES (
         'iPhone 12 Pro',
         'Teléfono en excelente estado, 128GB, color gris espacial.',
         550000,
-        'https://example.com/img/iphone12.jpg',
+        'https://placehold.co/600x400?text=Producto+Sin+Imagen',
         'usado'
     ),
     (
@@ -103,7 +103,7 @@ VALUES (
         'Lámpara de escritorio LED',
         'Lámpara moderna con brazo ajustable y luz cálida.',
         25000,
-        'https://example.com/img/lampara.jpg',
+        'https://placehold.co/600x400?text=Producto+Sin+Imagen',
         'nuevo'
     );
 INSERT INTO publicaciones (
@@ -121,7 +121,7 @@ VALUES (
         'Chaqueta de cuero',
         'Chaqueta de cuero genuino, talla M, poco uso.',
         80000,
-        'https://example.com/img/chaqueta.jpg',
+        'https://placehold.co/600x400?text=Producto+Sin+Imagen',
         'usado'
     ),
     (
@@ -130,7 +130,7 @@ VALUES (
         'Bicicleta de montaña',
         'Bicicleta con marco de aluminio, 21 velocidades.',
         180000,
-        'https://example.com/img/bicicleta.jpg',
+        'https://placehold.co/600x400?text=Producto+Sin+Imagen',
         'usado'
     );
 -- select * from usuarios;
