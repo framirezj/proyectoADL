@@ -11,8 +11,8 @@ export async function findById(id) {
   return rows[0] || null;
 }
 
-export async function publicacionesUser(userId, baseUrl, limit = 3, page = 1) {
-  const data = await selectPublicacionesUser(userId, limit, page);
+export async function publicacionesUser(userId, baseUrl, limit = 3, page = 1, estado = "") {
+  const data = await selectPublicacionesUser(userId, limit, page, estado);
 
   if (!data) {
     return {

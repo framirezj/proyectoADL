@@ -80,10 +80,10 @@ export async function actualizarProducto(productoId, data, user) {
 
 export async function obtenerPublicaciones(
   /* baseUrl */
-  { limit, order, page, categoria },
+  { limit, order, page, categoria, estado },
   request
 ) {
-  const result = await selectProductos({ limit, order, page, categoria });
+  const result = await selectProductos({ limit, order, page, categoria, estado });
 
   const baseUrl = request ? `${new URL(request.url).origin}` : "";
 
@@ -97,13 +97,13 @@ export async function obtenerPublicaciones(
         ? null
         : `${baseUrl}/api/producto?limit=${result.limit}&page=${
             Number(result.page) + 1
-          }`,
+          }${estado ? `&estado=${estado}` : ""}`,
     previous:
       result.page <= 1
         ? null
         : `${baseUrl}/api/producto?limit=${result.limit}&page=${
             Number(result.page) - 1
-          }`,
+          }${estado ? `&estado=${estado}` : ""}`,
     publicaciones: result.publicaciones.map((producto) => ({
       ...producto,
       imagen: producto.url_imagen || null,

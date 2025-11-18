@@ -56,7 +56,7 @@ export async function borrarProducto(req, res) {
 }
 
 export async function obtenerPublicaciones(req, res) {
-  const { limit, order, page = 1, categoria } = req.query;
+  const { limit, order, page = 1, categoria, estado } = req.query;
   // Utilizar una expresión regular para verificar si 'page' es un número válido
   const isPageValid = /^[1-9]\d*$/.test(page);
 
@@ -68,7 +68,7 @@ export async function obtenerPublicaciones(req, res) {
   }
 
   try {
-    const response = await obtener({ limit, order, page, categoria });
+    const response = await obtener({ limit, order, page, categoria, estado });
 
     res.status(200).json(response);
   } catch (error) {
