@@ -181,18 +181,28 @@ export default function Home() {
       >
         <div className="hero-overlay bg-opacity-60"></div>
         <div className="hero-content text-neutral-content text-center">
-          <div className="max-w-xl">
-            <h1 className="mb-5 text-5xl font-bold">Bienvenido a Pulga Vibe</h1>
+          <div className="w-full max-w-3xl bg-white/10 backdrop-blur-3xl backdrop-saturate-150 rounded-3xl p-8 shadow-2xl border border-white/20 text-base-content ring-1 ring-white/15">
+            <h1 className="mb-5 text-5xl font-bold whitespace-nowrap">
+              Bienvenido a Pulga Vibe
+            </h1>
             <p className="mb-5 text-lg">
               Descubre productos únicos y encuentra las mejores ofertas en
               nuestra comunidad
             </p>
-            <button
-              className="btn btn-primary btn-lg"
-              onClick={() => navigate("/catalogo")}
-            >
-              Explorar Productos
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                className="btn btn-primary btn-lg shadow-2xl ring ring-offset-2 ring-primary/40"
+                onClick={() => navigate("/catalogo")}
+              >
+                Explorar Productos
+              </button>
+              <button
+                className="btn btn-outline btn-secondary btn-lg bg-base-100/80 hover:bg-secondary hover:text-secondary-content shadow-xl"
+                onClick={() => navigate("/nuevo")}
+              >
+                Publicar Producto
+              </button>
+            </div>
           </div>
         </div>
       </div>
