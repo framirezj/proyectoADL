@@ -119,8 +119,21 @@ export default function ProductoForm() {
     setError("");
 
     // Validaciones básicas
-    if (!formData.titulo.trim()) {
+    const tituloTrim = formData.titulo.trim();
+    const descripcionTrim = formData.descripcion.trim();
+
+    if (!tituloTrim) {
       setError("El título del producto es requerido");
+      setLoading(false);
+      return;
+    }
+    if (tituloTrim.length < 5) {
+      setError("El título debe tener al menos 5 caracteres");
+      setLoading(false);
+      return;
+    }
+    if (tituloTrim.length > 40) {
+      setError("El título no puede superar 40 caracteres");
       setLoading(false);
       return;
     }
@@ -134,8 +147,18 @@ export default function ProductoForm() {
       setLoading(false);
       return;
     }
-    if (!formData.descripcion.trim()) {
+    if (!descripcionTrim) {
       setError("La descripción del producto es requerida");
+      setLoading(false);
+      return;
+    }
+    if (descripcionTrim.length < 10) {
+      setError("La descripción debe tener al menos 10 caracteres");
+      setLoading(false);
+      return;
+    }
+    if (descripcionTrim.length > 1000) {
+      setError("La descripción no puede superar 1000 caracteres");
       setLoading(false);
       return;
     }
@@ -248,8 +271,15 @@ export default function ProductoForm() {
                   placeholder="Ej: iPhone 13 Pro Max 256GB en perfecto estado"
                   value={formData.titulo}
                   onChange={handleChange}
+                  minLength={5}
+                  maxLength={40}
                   required
                 />
+                <label className="label">
+                  <span className="label-text-alt text-base-content/60">
+                    Mínimo 5 y máximo 40 caracteres
+                  </span>
+                </label>
               </div>
 
               {/* Categoría y Precio */}
@@ -328,8 +358,15 @@ export default function ProductoForm() {
                   placeholder="Describe tu producto en detalle..."
                   value={formData.descripcion}
                   onChange={handleChange}
+                  minLength={10}
+                  maxLength={1000}
                   required
                 ></textarea>
+                <label className="label">
+                  <span className="label-text-alt text-base-content/60">
+                    Mínimo 10 y máximo 1000 caracteres
+                  </span>
+                </label>
               </div>
 
               {/* Imagen */}
