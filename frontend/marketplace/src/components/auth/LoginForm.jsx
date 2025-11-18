@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axiosConfig";
 
-export default function LoginForm({login}) {
+export default function LoginForm({ login }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +32,7 @@ export default function LoginForm({login}) {
 
       const data = response.data;
       await login(data.user, data.token);
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     } catch (error) {
       // El manejo de errores es más simple con la instancia configurada
       const errorMessage = error.response?.data?.message || "Error en el login";
