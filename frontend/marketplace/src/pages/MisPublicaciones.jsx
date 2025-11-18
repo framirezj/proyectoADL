@@ -1,12 +1,16 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../api/axiosConfig";
 import Spinner from "../components/Spinner";
 import Pagination from "../components/Pagination";
 import { formatPesos } from "../util/format";
 import { showSuccess, showError } from "../util/toast";
+import { useAuth } from "../context/AuthContext";
+import { useCategories } from "../context/CategoriaContext";
 
 export default function MisPublicaciones() {
+  const { user } = useAuth();
+  const { categories } = useCategories();
   const [publicaciones, setPublicaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,12 +24,23 @@ export default function MisPublicaciones() {
     try {
       await api.delete(`/producto/${productoId}`);
 
-      // actulizar la lista
-      setPublicaciones((prevPublicaciones) =>
-        prevPublicaciones.filter((item) => item.id !== productoId)
-      );
+      setPublicaciones((prev) => prev.filter((item) => item.id !== productoId));
+
+      // Si era el último de la página y no es la primera, retroceder página
+      const isLastItemOnPage = publicaciones.length <= 1;
+      const targetPage = isLastItemOnPage && page > 1 ? page - 1 : page;
+
+      if (targetPage !== page) {
+        setPage(targetPage); // useEffect disparará el refetch
+      } else {
+        // Re-fetch para actualizar totales y datos
+        await fetchPublicaciones(targetPage, limit);
+      }
+
+      showSuccess("Publicación eliminada");
     } catch (error) {
       console.error("Error eliminando producto:", error);
+      showError("No se pudo eliminar la publicación");
     }
   };
 
@@ -101,7 +116,7 @@ export default function MisPublicaciones() {
             <div className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                 {/* Imagen del producto */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {publicacion.imagen ? (
                     <img
                       src={publicacion.imagen}
@@ -116,7 +131,7 @@ export default function MisPublicaciones() {
                 </div>
 
                 {/* Información principal */}
-                <div className="flex-grow">
+                <div className="grow">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
                     <div>
                       <h3 className="text-xl font-bold text-base-content mb-1">
@@ -124,7 +139,13 @@ export default function MisPublicaciones() {
                       </h3>
                       <div className="flex items-center space-x-4 mb-2">
                         <span className="text-base-content/70 text-sm">
-                          {publicacion.categoria}
+                          {publicacion.categoria ||
+                            (Array.isArray(categories)
+                              ? categories.find(
+                                  (c) => c.id === publicacion.categoria_id
+                                )?.nombre
+                              : undefined) ||
+                            "Sin categoría"}
                         </span>
                         {getEstadoBadge(publicacion.estado)}
                       </div>
@@ -213,35 +234,47 @@ export default function MisPublicaciones() {
     );
   };
 
-  const fetchPublicaciones = async (page = 1, limit = 3) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      // 🔹 Llamada a tu API
-      const response = await api.get(
-        `/usuarios/publicaciones?limit=${limit}&page=${page}`
-      );
-
-      const data = response.data;
-      // 🔹 Extraer solo el array de publicaciones
-      setPublicaciones(data.publicaciones || []);
-      setTotalRows(Number(data.total_publicaciones));
-      setTotalPages(Number(data.total_pages));
-      setLimit(Number(data.limit));
-      setPage(Number(data.page));
-    } catch (err) {
-      console.error(err);
-      setError("Error al cargar las publicaciones");
-      setPublicaciones([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchPublicaciones = useCallback(
+    async (page = 1, limit = 3) => {
+      try {
+        setLoading(true);
+        setError(null);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 🔹 Llamada a la API
+        let data;
+        if (user?.rol === "admin") {
+          const res = await api.get(`/producto?limit=${limit}&page=${page}`);
+          data = res.data;
+          setPublicaciones(data.publicaciones || []);
+          setTotalRows(Number(data.total_rows));
+          setTotalPages(Number(data.total_pages));
+          setLimit(Number(data.limit));
+          setPage(Number(data.page));
+        } else {
+          const res = await api.get(
+            `/usuarios/publicaciones?limit=${limit}&page=${page}`
+          );
+          data = res.data;
+          setPublicaciones(data.publicaciones || []);
+          setTotalRows(Number(data.total_publicaciones));
+          setTotalPages(Number(data.total_pages));
+          setLimit(Number(data.limit));
+          setPage(Number(data.page));
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar las publicaciones");
+        setPublicaciones([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user?.rol]
+  );
 
   useEffect(() => {
     fetchPublicaciones(page, limit);
-  }, [page]);
+  }, [page, limit, user?.rol, fetchPublicaciones]);
 
   return (
     <div className="min-h-screen bg-base-200 py-8 px-4">
@@ -251,7 +284,9 @@ export default function MisPublicaciones() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="mb-6 lg:mb-0">
               <h1 className="text-4xl font-bold text-base-content mb-2">
-                Mis Publicaciones
+                {user?.rol === "admin"
+                  ? "Todas las Publicaciones"
+                  : "Mis Publicaciones"}
               </h1>
               <p className="text-base-content/70 text-lg">
                 Gestiona y revisa el rendimiento de tus productos publicados

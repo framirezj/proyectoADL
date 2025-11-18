@@ -39,10 +39,16 @@ export async function addProducto(req, res) {
 export async function borrarProducto(req, res) {
   try {
     const { id: productoId } = req.params;
-    await borrar(productoId);
+    await borrar(productoId, req.user);
     res.status(204).send();
   } catch (error) {
     console.error("Error al remover producto:", error.message);
+    if (error.status === 403) {
+      return res.status(403).json({ error: error.message });
+    }
+    if (error.status === 404) {
+      return res.status(404).json({ error: error.message });
+    }
     res
       .status(500)
       .json({ error: error.message || "Error al remover producto" });

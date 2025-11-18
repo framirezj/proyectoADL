@@ -30,8 +30,24 @@ export async function crearProducto(data) {
   return nuevoProducto;
 }
 
-export async function borrarProducto(productoId) {
-  return await deleteProducto(productoId);
+export async function borrarProducto(productoId, user) {
+  // Verificar existencia y permisos
+  const producto = await selectProducto(productoId);
+  if (!producto) {
+    const err = new Error("Producto no encontrado");
+    err.status = 404;
+    throw err;
+  }
+
+  // Solo el dueño (usuario_id) o admin puede borrar
+  if (producto.usuario_id !== user.userId && user.role !== "admin") {
+    const err = new Error("No tienes permisos para borrar este producto");
+    err.status = 403;
+    throw err;
+  }
+
+  await deleteProducto(productoId);
+  return true;
 }
 
 export async function actualizarProducto(productoId, data, user) {
