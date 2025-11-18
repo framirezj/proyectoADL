@@ -67,10 +67,12 @@ const ProductGallery = () => {
           {products.map((product) => (
             <div
               key={product.id}
-              className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
+              className={`card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 ${
+                product.estado === "vendido" ? "opacity-80" : ""
+              }`}
             >
               <figure
-                className="px-4 pt-4 cursor-pointer group"
+                className="px-4 pt-4 cursor-pointer group relative"
                 onClick={() => handleDetails(product.id)}
               >
                 <img
@@ -78,6 +80,13 @@ const ProductGallery = () => {
                   alt={product.titulo}
                   className="rounded-xl h-48 w-full object-cover"
                 />
+                {product.estado === "vendido" && (
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
+                    <span className="badge badge-error text-white badge-lg">
+                      Vendido
+                    </span>
+                  </div>
+                )}
               </figure>
               <div className="card-body">
                 <div className="flex justify-between items-start mb-2">
@@ -108,15 +117,21 @@ const ProductGallery = () => {
                   <span className="text-2xl font-bold text-primary">
                     ${formatPesos(product.precio)}
                   </span>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => addToCart(product)}
-                    disabled={isInCart(product.id)}
-                  >
-                    {isInCart(product.id)
-                      ? "En el carrito"
-                      : "Agregar al carrito"}
-                  </button>
+                  {product.estado === "vendido" ? (
+                    <span className="badge badge-error text-white">
+                      Vendido
+                    </span>
+                  ) : (
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => addToCart(product)}
+                      disabled={isInCart(product.id)}
+                    >
+                      {isInCart(product.id)
+                        ? "En el carrito"
+                        : "Agregar al carrito"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

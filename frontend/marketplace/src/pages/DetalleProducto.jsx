@@ -199,12 +199,21 @@ export default function ProductDetail() {
           {/* Galería de imágenes */}
           <div className="space-y-6">
             {/* Imagen principal */}
-            <div className="bg-base-100 rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-base-100 rounded-2xl shadow-lg overflow-hidden relative">
               <img
                 src={getImageUrl(product.imagen)}
                 alt={product.titulo}
-                className="w-full h-96 object-cover hover:scale-105 transition-transform duration-500"
+                className={`w-full h-96 object-cover hover:scale-105 transition-transform duration-500 ${
+                  product.estado === "vendido" ? "opacity-80" : ""
+                }`}
               />
+              {product.estado === "vendido" && (
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <span className="badge badge-error text-white badge-lg">
+                    Vendido
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -257,8 +266,13 @@ export default function ProductDetail() {
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => addToCart(product)}
-                disabled={isInCart(product.id)}
+                disabled={isInCart(product.id) || product.estado === "vendido"}
                 className="btn btn-primary btn-lg flex-1 gap-2"
+                title={
+                  product.estado === "vendido"
+                    ? "Este producto ya fue vendido"
+                    : undefined
+                }
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -276,13 +290,11 @@ export default function ProductDetail() {
                 </svg>
                 Agregar al Carrito
               </button>
-              {/* <button
-                onClick={handleBuyNow}
-                disabled={product.stock === 0}
-                className="btn btn-secondary btn-lg flex-1"
-              >
-                Comprar Ahora
-              </button> */}
+              {product.estado === "vendido" && (
+                <div className="alert alert-error text-sm">
+                  Este producto ya fue vendido y no está disponible.
+                </div>
+              )}
             </div>
 
             {/* Características rápidas */}

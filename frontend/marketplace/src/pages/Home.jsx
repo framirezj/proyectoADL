@@ -84,7 +84,9 @@ export default function Home() {
           {publicaciones.map((product) => (
             <div
               key={product.id}
-              className="card bg-base-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+              className={`card bg-base-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group ${
+                product.estado === "vendido" ? "opacity-80" : ""
+              }`}
               onClick={() => handleDetails(product.id)}
             >
               <figure className="relative overflow-hidden">
@@ -93,6 +95,13 @@ export default function Home() {
                   alt={product.titulo || "Producto sin título"}
                   className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                {product.estado === "vendido" && (
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <span className="badge badge-error text-white badge-lg">
+                      Vendido
+                    </span>
+                  </div>
+                )}
                 <div className="absolute top-4 right-4">
                   <div className="badge badge-primary badge-lg font-semibold">
                     ${formatPesos(product.precio || 0)}
@@ -126,15 +135,22 @@ export default function Home() {
                   {product.descripcion || "Sin descripción disponible"}
                 </p>
                 <div className="card-actions justify-between items-center">
-                  <button
-                    className="btn btn-ghost btn-sm text-primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDetails(product.id);
-                    }}
-                  >
-                    Ver detalles →
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      className="btn btn-ghost btn-sm text-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDetails(product.id);
+                      }}
+                    >
+                      Ver detalles →
+                    </button>
+                    {product.estado === "vendido" ? (
+                      <span className="badge badge-error text-white">
+                        Vendido
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>

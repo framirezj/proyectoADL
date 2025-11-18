@@ -4,6 +4,7 @@ import api from "../api/axiosConfig";
 import Spinner from "../components/Spinner";
 import Pagination from "../components/Pagination";
 import { formatPesos } from "../util/format";
+import { showSuccess, showError } from "../util/toast";
 
 export default function MisPublicaciones() {
   const [publicaciones, setPublicaciones] = useState([]);
@@ -28,10 +29,24 @@ export default function MisPublicaciones() {
     }
   };
 
+  const handleMarkSold = async (productoId) => {
+    try {
+      await api.put(`/producto/${productoId}`, { condicion: "vendido" });
+      setPublicaciones((prev) =>
+        prev.map((p) => (p.id === productoId ? { ...p, estado: "vendido" } : p))
+      );
+      showSuccess("Publicación marcada como vendida");
+    } catch (error) {
+      console.error("Error marcando como vendido:", error);
+      showError("No se pudo marcar como vendido");
+    }
+  };
+
   const getEstadoBadge = (condicion) => {
     const config = {
       nuevo: { clase: "badge-success", texto: "Nuevo" },
       usado: { clase: "badge-warning", texto: "Usado" },
+      vendido: { clase: "badge-error", texto: "Vendido" },
     };
 
     const { clase, texto } = config[condicion];
@@ -79,7 +94,9 @@ export default function MisPublicaciones() {
         {publicaciones.map((publicacion) => (
           <div
             key={publicacion.id}
-            className="bg-base-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className={`bg-base-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+              publicacion.estado === "vendido" ? "opacity-80" : ""
+            }`}
           >
             <div className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-start gap-6">
@@ -123,6 +140,26 @@ export default function MisPublicaciones() {
                   {/* Acciones */}
                   <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-base-300">
                     <div className="flex flex-wrap gap-2">
+                      {publicacion.estado !== "vendido" && (
+                        <button
+                          className="btn btn-outline btn-warning btn-sm gap-2"
+                          onClick={() => handleMarkSold(publicacion.id)}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Marcar vendido
+                        </button>
+                      )}
                       <Link
                         to={`/editar/${publicacion.id}`}
                         className="btn btn-outline btn-primary btn-sm gap-2"

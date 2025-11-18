@@ -1,10 +1,21 @@
 import { useCart } from "../context/CartContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  showLoading,
+  dismissToast,
+  showSuccess,
+  showError,
+} from "../util/toast";
 import { formatPesos } from "../util/format";
+import api from "../api/axiosConfig";
 
 const ShoppingCart = () => {
   const { cartItems, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [processing, setProcessing] = useState(false);
 
   const IVA_RATE = 0.19;
   const hasItems = cartItems.length > 0;
@@ -183,12 +194,42 @@ const ShoppingCart = () => {
 
               <button
                 className="btn btn-primary btn-block btn-lg mb-4"
-                disabled={!hasItems}
+                disabled={!hasItems || processing}
                 title={
                   !hasItems ? "Agrega productos para continuar" : undefined
                 }
+                onClick={async () => {
+                  try {
+                    setProcessing(true);
+                    const toastId = showLoading("Procesando pago...");
+                    // Simulación: marcar productos como vendidos en backend
+                    for (const item of cartItems) {
+                      try {
+                        await api.put(`/producto/${item.id}`, {
+                          condicion: "vendido",
+                        });
+                      } catch (e) {
+                        console.error("Error marcando vendido:", e);
+                      }
+                    }
+                    dismissToast(toastId);
+                    showSuccess(
+                      `Enviamos los datos de pago a ${
+                        user?.email || "tu correo"
+                      }`
+                    );
+                    clearCart();
+                  } catch (e) {
+                    console.error(e);
+                    showError(
+                      "No se pudo procesar el pago. Intenta nuevamente."
+                    );
+                  } finally {
+                    setProcessing(false);
+                  }
+                }}
               >
-                Proceder al pago
+                {processing ? "Procesando..." : "Proceder al pago"}
               </button>
 
               <button
