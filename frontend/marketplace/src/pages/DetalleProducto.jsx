@@ -243,9 +243,14 @@ export default function ProductDetail() {
               <p className="text-4xl font-bold text-primary">
                 ${formatPesos(product.precio)}
               </p>
-              <p className="text-sm text-base-content/70 mt-1">
-                IVA incluido • Envío gratis
-              </p>
+              <div className="mt-2 text-sm text-base-content/70 space-y-1">
+                <p>Neto: ${formatPesos(product.precio / 1.19)}</p>
+                <p>
+                  IVA (19%): $
+                  {formatPesos(product.precio - product.precio / 1.19)}
+                </p>
+                <p className="opacity-80">Precio incluye IVA • Envío gratis</p>
+              </div>
             </div>
 
             {/* Acciones */}

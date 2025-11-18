@@ -1,13 +1,23 @@
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 import { formatPesos } from "../util/format";
 
 const ShoppingCart = () => {
   const { cartItems, removeFromCart, clearCart } = useCart();
+  const navigate = useNavigate();
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.precio, 0);
-  const shipping = 5.99;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const IVA_RATE = 0.19;
+  const hasItems = cartItems.length > 0;
+  const subtotal = cartItems.reduce((sum, item) => sum + item.precio, 0); // Productos BRUTO (con IVA)
+  const shipping = hasItems ? 0 : 0; //
+
+  const productosNeto = hasItems ? subtotal / (1 + IVA_RATE) : 0;
+  const ivaProductos = hasItems ? subtotal - productosNeto : 0;
+  const ivaEnvio = hasItems ? shipping * IVA_RATE : 0;
+
+  const neto = hasItems ? productosNeto + shipping : 0; // Neto total (productos netos + envío neto)
+  const tax = hasItems ? ivaProductos + ivaEnvio : 0; // IVA total (productos + envío)
+  const total = hasItems ? neto + tax : 0; // Debe coincidir con subtotal + envío + IVA envío
 
   return (
     <div className="min-h-screen bg-base-200 py-8">
@@ -33,6 +43,8 @@ const ShoppingCart = () => {
                 <button
                   className="btn btn-ghost btn-sm text-error"
                   onClick={() => clearCart()}
+                  disabled={!hasItems}
+                  title={!hasItems ? "No hay productos para vaciar" : undefined}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -53,6 +65,18 @@ const ShoppingCart = () => {
               </div>
 
               <div className="space-y-4">
+                {!hasItems && (
+                  <div className="p-6 text-center text-base-content/70">
+                    <div className="text-6xl mb-3">🛒</div>
+                    <p className="mb-2 font-semibold">Tu carrito está vacío</p>
+                    <p className="text-sm mb-4">
+                      Agrega productos para ver envío, IVA y total.
+                    </p>
+                    <a href="/catalogo" className="btn btn-primary btn-sm">
+                      Explorar productos
+                    </a>
+                  </div>
+                )}
                 {cartItems.map((item) => (
                   <div
                     key={item.id}
@@ -71,7 +95,18 @@ const ShoppingCart = () => {
                         <div className="flex-1">
                           <h3 className="card-title text-lg">{item.titulo}</h3>
                           <p className="text-lg font-bold text-primary mt-2">
-                            ${formatPesos(item.precio, { decimals: 2 })}
+                            ${formatPesos(item.precio, { decimals: 0 })}
+                          </p>
+                          <p className="text-xs text-base-content/60 mt-1">
+                            Neto: $
+                            {formatPesos(item.precio / (1 + IVA_RATE), {
+                              decimals: 0,
+                            })}{" "}
+                            • IVA: $
+                            {formatPesos(
+                              item.precio - item.precio / (1 + IVA_RATE),
+                              { decimals: 0 }
+                            )}
                           </p>
                         </div>
 
@@ -110,26 +145,56 @@ const ShoppingCart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span>Subtotal ({cartItems.length} productos)</span>
-                  <span>${formatPesos(subtotal, { decimals: 2 })}</span>
+                  <span>${formatPesos(subtotal, { decimals: 0 })}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Envío</span>
-                  <span>${formatPesos(shipping, { decimals: 2 })}</span>
-                </div>
-                <div className="divider"></div>
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span className="text-primary">
-                    ${formatPesos(total, { decimals: 2 })}
-                  </span>
-                </div>
+                {hasItems ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span>Envío</span>
+                      <span>${formatPesos(shipping, { decimals: 0 })}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>IVA (19%)</span>
+                      <span>${formatPesos(tax, { decimals: 0 })}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Neto</span>
+                      <span>${formatPesos(neto, { decimals: 0 })}</span>
+                    </div>
+                    <div className="divider"></div>
+                    <div className="flex justify-between text-lg font-bold">
+                      <span>Total</span>
+                      <span className="text-primary">
+                        ${formatPesos(total, { decimals: 0 })}
+                      </span>
+                    </div>
+                    <p className="text-xs text-base-content/60">
+                      El total incluye IVA (19%) por $
+                      {formatPesos(tax, { decimals: 0 })} sobre productos y
+                      envío.
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-base-content/60">
+                    Agrega productos para calcular envío e IVA.
+                  </p>
+                )}
               </div>
 
-              <button className="btn btn-primary btn-block btn-lg mb-4">
+              <button
+                className="btn btn-primary btn-block btn-lg mb-4"
+                disabled={!hasItems}
+                title={
+                  !hasItems ? "Agrega productos para continuar" : undefined
+                }
+              >
                 Proceder al pago
               </button>
 
-              <button className="btn btn-outline btn-block">
+              <button
+                className="btn btn-outline btn-block"
+                onClick={() => navigate("/catalogo")}
+              >
                 Continuar comprando
               </button>
 
@@ -162,7 +227,7 @@ const ShoppingCart = () => {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Envío gratis en compras mayores a $100</span>
+                  <span>Envío rápido a todo Chile</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <svg
