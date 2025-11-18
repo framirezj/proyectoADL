@@ -4,6 +4,7 @@ import { useCategories } from "../context/CategoriaContext.jsx";
 import api from "../api/axiosConfig.js";
 import Spinner from "../components/Spinner.jsx";
 import { showSuccess } from "../util/toast.js";
+import { formatPesos } from "../util/format.js";
 
 export default function ProductoForm() {
   // Estados
@@ -363,7 +364,7 @@ export default function ProductoForm() {
                   </div>
                   <label className="label">
                     <span className="label-text-alt text-base-content/60">
-                      Solo números, sin puntos ni comas (CLP)
+                      Vista previa: ${formatPesos(formData.precio || 0)}
                     </span>
                   </label>
                 </div>
