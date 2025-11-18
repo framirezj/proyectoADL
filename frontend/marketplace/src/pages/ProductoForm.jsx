@@ -106,7 +106,13 @@ export default function ProductoForm() {
         setPreviewImage("");
       }
     } else {
-      setFormData((prevState) => ({ ...prevState, [name]: value }));
+      if (name === "precio") {
+        // Solo números enteros (CLP), sin puntos ni comas
+        const sanitized = value.replace(/\D/g, "");
+        setFormData((prevState) => ({ ...prevState, [name]: sanitized }));
+      } else {
+        setFormData((prevState) => ({ ...prevState, [name]: value }));
+      }
     }
 
     if (error) setError("");
@@ -142,8 +148,8 @@ export default function ProductoForm() {
       setLoading(false);
       return;
     }
-    if (!formData.precio || parseFloat(formData.precio) <= 0) {
-      setError("El precio debe ser mayor a 0");
+    if (!formData.precio || parseInt(formData.precio, 10) <= 0) {
+      setError("El precio debe ser un número entero mayor a 0");
       setLoading(false);
       return;
     }
@@ -179,7 +185,7 @@ export default function ProductoForm() {
       const submitData = new FormData();
       submitData.append("titulo", formData.titulo);
       submitData.append("categoria", formData.categoria);
-      submitData.append("precio", parseFloat(formData.precio));
+      submitData.append("precio", parseInt(formData.precio, 10));
       submitData.append("descripcion", formData.descripcion);
       submitData.append("condicion", formData.condicion);
       if (formData.imagen) submitData.append("imagen", formData.imagen);
@@ -331,17 +337,35 @@ export default function ProductoForm() {
                       $
                     </span>
                     <input
-                      type="number"
+                      type="text"
                       name="precio"
                       className="input input-bordered input-lg w-full pl-12 focus:input-primary"
-                      placeholder="0.00"
-                      step="0.01"
-                      min="0"
+                      placeholder="0"
+                      inputMode="numeric"
+                      pattern="\\d*"
                       value={formData.precio}
                       onChange={handleChange}
+                      onPaste={(e) => {
+                        const text = (
+                          e.clipboardData || window.clipboardData
+                        ).getData("text");
+                        if (/[^\d]/.test(text)) {
+                          e.preventDefault();
+                          const onlyDigits = text.replace(/\D/g, "");
+                          setFormData((prev) => ({
+                            ...prev,
+                            precio: onlyDigits,
+                          }));
+                        }
+                      }}
                       required
                     />
                   </div>
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">
+                      Solo números, sin puntos ni comas (CLP)
+                    </span>
+                  </label>
                 </div>
               </div>
 
