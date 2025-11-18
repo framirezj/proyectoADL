@@ -1,6 +1,11 @@
 import pool from "../config/db.js";
 
-export async function selectPublicacionesUser(userId, limit = 3, page = 1, estado = "") {
+export async function selectPublicacionesUser(
+  userId,
+  limit = 3,
+  page = 1,
+  estado = ""
+) {
   try {
     const offset = (page - 1) * limit;
 
@@ -12,8 +17,10 @@ export async function selectPublicacionesUser(userId, limit = 3, page = 1, estad
       countConditions.push(`estado = $${paramIndex++}`);
       countParams.push(estado);
     }
-    const totalQuery = `SELECT COUNT(*) FROM publicaciones WHERE ${countConditions.join(" AND ")};`;
-    const {rows: totalResult} = await pool.query(totalQuery, countParams);
+    const totalQuery = `SELECT COUNT(*) FROM publicaciones WHERE ${countConditions.join(
+      " AND "
+    )};`;
+    const { rows: totalResult } = await pool.query(totalQuery, countParams);
 
     const total_rows = parseInt(totalResult[0].count, 10);
     const total_pages = Math.ceil(total_rows / limit);
@@ -47,7 +54,6 @@ export async function selectPublicacionesUser(userId, limit = 3, page = 1, estad
     const publicacionesResult = await pool.query(query, pubParams);
     const publicaciones = publicacionesResult.rows;
 
-
     // Información del usuario
     const userQuery = `
       SELECT id AS usuario_id, username, nombre
@@ -66,7 +72,6 @@ export async function selectPublicacionesUser(userId, limit = 3, page = 1, estad
       limit,
       publicaciones,
     };
-
   } catch (error) {
     console.error("❌ Error ejecutando selectPublicacionesUser:", error);
   }

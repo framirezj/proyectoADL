@@ -64,7 +64,9 @@ export async function selectProductos({
     params.push(estado);
   }
 
-  const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const whereClause = conditions.length
+    ? `WHERE ${conditions.join(" AND ")}`
+    : "";
 
   // 🔢 1. Contar total de registros (filtrados o no)
   const countQuery = `SELECT COUNT(*) FROM publicaciones ${whereClause}`;

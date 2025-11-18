@@ -83,7 +83,13 @@ export async function obtenerPublicaciones(
   { limit, order, page, categoria, estado },
   request
 ) {
-  const result = await selectProductos({ limit, order, page, categoria, estado });
+  const result = await selectProductos({
+    limit,
+    order,
+    page,
+    categoria,
+    estado,
+  });
 
   const baseUrl = request ? `${new URL(request.url).origin}` : "";
 
