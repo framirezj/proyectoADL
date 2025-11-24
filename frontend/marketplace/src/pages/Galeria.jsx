@@ -6,6 +6,7 @@ import { formatPesos } from "../util/format";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import Pagination from "../components/Pagination";
+import Filtros from "../components/Filtros";
 
 const ProductGallery = () => {
   const { categories, loading: loadingCategorias } = useCategories();
@@ -207,93 +208,16 @@ const ProductGallery = () => {
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar de categorías */}
-          <div className="lg:w-1/4">
-            <div className="bg-base-100 rounded-lg shadow-lg p-6 sticky top-6">
-              <h2 className="text-xl font-semibold mb-4 text-secondary">
-                Filtros
-              </h2>
-
-              {loadingCategorias ? (
-                <Spinner />
-              ) : safeCategories.length > 0 ? (
-                <div className="space-y-4">
-                  {/* Categorías */}
-                  <div className="divider mb-2">Categorías</div>
-                  <div className="space-y-2">
-                    <button
-                      className={`btn btn-block justify-start ${
-                        selectedCategory === 0 ? "btn-primary" : "btn-ghost"
-                      }`}
-                      onClick={() => setSelectedCategory(0)}
-                    >
-                      Todas
-                    </button>
-                    {safeCategories.map((category) => (
-                      <button
-                        key={category.id}
-                        className={`btn btn-block justify-start ${
-                          selectedCategory === category.id
-                            ? "btn-primary"
-                            : "btn-ghost"
-                        }`}
-                        onClick={() => setSelectedCategory(category.id)}
-                      >
-                        {category.nombre}
-                      </button>
-                    ))}
-                  </div>
-                  {/* Divisor con texto */}
-                  <div className="divider my-2">Estado</div>
-                  {/* Estado */}
-                  <div className="space-y-2">
-                    {[
-                      { label: "Todos", value: "todos" },
-                      { label: "Nuevo", value: "nuevo" },
-                      { label: "Usado", value: "usado" },
-                      { label: "Vendido", value: "vendido" },
-                    ].map((opt) => (
-                      <button
-                        key={opt.value}
-                        className={`btn btn-block justify-start ${
-                          estadoFilter === opt.value
-                            ? "btn-primary"
-                            : "btn-ghost"
-                        }`}
-                        onClick={() => setEstadoFilter(opt.value)}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-base-content/60">
-                  No hay categorías disponibles
-                </p>
-              )}
-
-              {/* Información del filtro activo */}
-              <div className="mt-6 p-4 bg-info text-info-content rounded-lg">
-                <p className="font-semibold">Filtros activos:</p>
-                <p className="text-lg">
-                  Categoría:{" "}
-                  {safeCategories.find((cat) => cat.id === selectedCategory)
-                    ?.nombre || "Todas"}
-                </p>
-                <p className="text-lg">
-                  Estado:{" "}
-                  {estadoFilter === "todos"
-                    ? "Todos"
-                    : estadoFilter.charAt(0).toUpperCase() +
-                      estadoFilter.slice(1)}
-                </p>
-                <p className="text-sm mt-2">
-                  {totalRows} producto{products.length !== 1 ? "s" : ""}{" "}
-                  encontrado{products.length !== 1 ? "s" : ""}
-                </p>
-              </div>
-            </div>
-          </div>
+          <Filtros
+            safeCategories={safeCategories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            estadoFilter={estadoFilter}
+            setEstadoFilter={setEstadoFilter}
+            totalRows={totalRows}
+            loadingCategorias={loadingCategorias}
+            products={products}
+          />
 
           {/* Galería de productos */}
           {renderProducts()}
