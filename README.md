@@ -15,10 +15,10 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 
 ## 🎯 Objetivos del Hito 1
 
-1. 🎨 Diseñar el **boceto de las vistas** principales del proyecto.  
-2. 🔗 Definir la **navegación entre vistas**, distinguiendo las públicas y privadas.  
-3. ⚙️ Elaborar el **listado de dependencias** a utilizar en el proyecto.  
-4. 🧩 Diseñar el **modelo de base de datos** y sus relaciones.  
+1. 🎨 Diseñar el **boceto de las vistas** principales del proyecto.
+2. 🔗 Definir la **navegación entre vistas**, distinguiendo las públicas y privadas.
+3. ⚙️ Elaborar el **listado de dependencias** a utilizar en el proyecto.
+4. 🧩 Diseñar el **modelo de base de datos** y sus relaciones.
 5. 📡 Diseñar el **contrato de datos de la API REST**.
 
 ---
@@ -29,13 +29,14 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 > Se pueden usar herramientas como **Figma**, **Canva**, **Google Slides** o **Draw.io**.
 
 **Vistas requeridas:**
-- 🏠 Página principal  
-- 🧑‍💻 Registro de usuarios  
-- 🔑 Inicio de sesión  
-- 🙍 Mi perfil  
-- 📝 Formulario para crear publicación  
-- 🖼️ Galería de publicaciones  
-- 🔍 Detalle de una publicación  
+
+- 🏠 Página principal
+- 🧑‍💻 Registro de usuarios
+- 🔑 Inicio de sesión
+- 🙍 Mi perfil
+- 📝 Formulario para crear publicación
+- 🖼️ Galería de publicaciones
+- 🔍 Detalle de una publicación
 
 <img width="488" height="244" alt="image" src="https://github.com/user-attachments/assets/cc7c1303-ec39-4052-a7b9-6ab54de658be" />
 <img width="488" height="241" alt="image" src="https://github.com/user-attachments/assets/7b4ef2c8-8c26-4d65-9595-dcc140f22b16" />
@@ -53,20 +54,21 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 > Se deben distinguir las vistas **públicas** y **privadas** según los accesos.
 
 **Públicas:**
-- Página principal  
-- Registro  
+
+- Página principal
+- Registro
 - Inicio de sesión
 - Galeria
 - Detalle publicación
 - Carro de compras
 
 **Privadas:**
-- Mi perfil  
-- Crear publicación 
-- Mis publicaciones
-  
-![vistas](https://github.com/user-attachments/assets/51382e7a-ca1e-4041-8fbf-dfe9ad4e8f23)
 
+- Mi perfil
+- Crear publicación
+- Mis publicaciones
+
+![vistas](https://github.com/user-attachments/assets/51382e7a-ca1e-4041-8fbf-dfe9ad4e8f23)
 
 ---
 
@@ -74,23 +76,37 @@ Este **primer hito** se enfoca en la **planificación y diseño inicial** del si
 
 > Lista de librerías, frameworks o herramientas que se utilizarán.
 
-Frontend
+### Frontend
+
 ```json
 {
-  "dependencies": [
-    "vite",
+  "produccion": [
     "react",
+    "react-dom",
     "react-router-dom",
     "axios",
     "lucide-react",
     "react-hot-toast",
     "tailwindcss",
-    "daisyui"
+    "@tailwindcss/vite"
+  ],
+  "desarrollo": [
+    "vite",
+    "@vitejs/plugin-react",
+    "eslint",
+    "@eslint/js",
+    "eslint-plugin-react-hooks",
+    "eslint-plugin-react-refresh",
+    "daisyui",
+    "@types/react",
+    "@types/react-dom",
+    "globals"
   ]
 }
 ```
 
-Backend
+### Backend
+
 ```json
 {
   "produccion": [
@@ -102,14 +118,13 @@ Backend
     "pg",
     "pg-format",
     "morgan",
+    "cloudinary",
+    "multer",
+    "multer-storage-cloudinary"
   ],
-  "desarrollo": [
-    "nodemon",
-    "jest"
-  ]
+  "desarrollo": ["nodemon", "jest", "supertest"]
 }
 ```
-
 
 ---
 
@@ -118,8 +133,37 @@ Backend
 > Se debe representar el modelo de datos y las relaciones entre las tablas.  
 > Puedes usar **Draw.io**, **Lucidchart**, **DB Diagram** u otra herramienta similar.
 
-<img width="931" height="361" alt="bd drawio" src="https://github.com/user-attachments/assets/6febdd9d-a4de-423a-bbee-adc9b06df912" />
+### Tablas
 
+#### usuarios
+
+- `id` (SERIAL PRIMARY KEY)
+- `username` (VARCHAR(50) UNIQUE NOT NULL)
+- `email` (VARCHAR(100) UNIQUE NOT NULL)
+- `password` (VARCHAR(100) NOT NULL)
+- `nombre` (VARCHAR(100) NOT NULL)
+- `fecha_registro` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+- `rol` (VARCHAR(10) DEFAULT 'user', CHECK: 'admin' o 'user')
+
+#### categorias
+
+- `id` (SERIAL PRIMARY KEY)
+- `nombre` (VARCHAR(100) NOT NULL)
+- `descripcion` (TEXT NOT NULL)
+
+#### publicaciones
+
+- `id` (SERIAL PRIMARY KEY)
+- `usuario_id` (INT, FK → usuarios.id, ON DELETE CASCADE)
+- `categoria_id` (INT, FK → categorias.id, ON DELETE SET NULL)
+- `titulo` (VARCHAR(150) NOT NULL)
+- `descripcion` (TEXT NOT NULL)
+- `precio` (INT NOT NULL)
+- `url_imagen` (TEXT NOT NULL)
+- `fecha_creacion` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+- `estado` (VARCHAR(10) NOT NULL, valores: 'nuevo' o 'usado')
+
+<img width="931" height="361" alt="bd drawio" src="https://github.com/user-attachments/assets/6febdd9d-a4de-423a-bbee-adc9b06df912" />
 
 ---
 
@@ -127,12 +171,9 @@ Backend
 
 > Documento que define los **endpoints**, **métodos HTTP**, **rutas**, **parámetros** y **estructuras de datos** esperadas.
 
-
-
-**Ejemplo:**
 ```json
 {
-  "name": "Pulganga API",
+  "name": "Marketplace API",
   "version": "1.0.0",
   "auth": {
     "type": "JWT",
@@ -140,7 +181,7 @@ Backend
   },
   "endpoints": {
     "auth": {
-      "POST /auth/register": {
+      "POST /api/auth/register": {
         "desc": "Registrar nuevo usuario",
         "body": {
           "username": "string",
@@ -161,7 +202,7 @@ Backend
           "token": "<jwt_token>"
         }
       },
-      "POST /auth/login": {
+      "POST /api/auth/login": {
         "desc": "Iniciar sesión",
         "body": {
           "email": "string",
@@ -179,7 +220,7 @@ Backend
       }
     },
     "usuarios": {
-      "GET /usuarios/me": {
+      "GET /api/usuarios/me": {
         "auth": true,
         "desc": "Obtener perfil del usuario autenticado",
         "response": {
@@ -191,9 +232,9 @@ Backend
           "fecha_registro": "2025-10-24T15:10:00Z"
         }
       },
-      "GET /usuarios/:id/publicaciones": {
+      "GET /api/usuarios/publicaciones": {
         "auth": true,
-        "desc": "Obtener publicaciones del usuario (autenticado o admin)",
+        "desc": "Obtener publicaciones del usuario autenticado",
         "response": [
           {
             "id": 12,
@@ -203,36 +244,30 @@ Backend
             "url_imagen": "https://img.com/bici.jpg",
             "categoria": "Deportes",
             "fecha_creacion": "2025-10-20T12:00:00Z",
-            "estado": true
+            "estado": "usado"
           }
         ]
       }
     },
     "categorias": {
-      "GET /categorias": {
+      "GET /api/categoria": {
         "desc": "Listar todas las categorías",
         "response": [
-          { "id": 1, "nombre": "Electrónica", "descripcion": "Celulares, TV, etc." },
-          { "id": 2, "nombre": "Hogar", "descripcion": "Muebles, decoración" }
+          {
+            "id": 1,
+            "nombre": "Electrónica",
+            "descripcion": "Celulares, TV, etc."
+          },
+          {
+            "id": 2,
+            "nombre": "Hogar",
+            "descripcion": "Muebles, decoración"
+          }
         ]
-      },
-      "POST /categorias": {
-        "auth": true,
-        "role": "admin",
-        "desc": "Crear nueva categoría",
-        "body": {
-          "nombre": "string",
-          "descripcion": "string"
-        },
-        "response": {
-          "id": 3,
-          "nombre": "Deportes",
-          "descripcion": "Artículos deportivos"
-        }
       }
     },
-    "publicaciones": {
-      "GET /publicaciones": {
+    "productos": {
+      "GET /api/producto": {
         "desc": "Listar todas las publicaciones (catálogo)",
         "query": {
           "categoria_id": "int (opcional)"
@@ -244,14 +279,42 @@ Backend
             "descripcion": "En excelente estado",
             "precio": 120000,
             "url_imagen": "https://img.com/bici.jpg",
-            "categoria": { "id": 2, "nombre": "Deportes" },
-            "usuario": { "id": 1, "username": "juan123" },
+            "categoria": {
+              "id": 2,
+              "nombre": "Deportes"
+            },
+            "usuario": {
+              "id": 1,
+              "username": "juan123"
+            },
             "fecha_creacion": "2025-10-20T12:00:00Z",
-            "estado": true
+            "estado": "usado"
           }
         ]
       },
-      "GET /publicaciones/:id": {
+      "GET /api/producto/random": {
+        "desc": "Obtener publicaciones aleatorias para la página principal",
+        "response": [
+          {
+            "id": 5,
+            "titulo": "Bicicleta de montaña",
+            "descripcion": "En excelente estado",
+            "precio": 120000,
+            "url_imagen": "https://img.com/bici.jpg",
+            "categoria": {
+              "id": 2,
+              "nombre": "Deportes"
+            },
+            "usuario": {
+              "id": 1,
+              "username": "juan123"
+            },
+            "fecha_creacion": "2025-10-20T12:00:00Z",
+            "estado": "usado"
+          }
+        ]
+      },
+      "GET /api/producto/:id": {
         "desc": "Obtener detalles de una publicación",
         "response": {
           "id": 5,
@@ -259,45 +322,70 @@ Backend
           "descripcion": "En excelente estado",
           "precio": 120000,
           "url_imagen": "https://img.com/bici.jpg",
-          "categoria": { "id": 2, "nombre": "Deportes" },
-          "usuario": { "id": 1, "username": "juan123" },
+          "categoria": {
+            "id": 2,
+            "nombre": "Deportes"
+          },
+          "usuario": {
+            "id": 1,
+            "username": "juan123"
+          },
           "fecha_creacion": "2025-10-20T12:00:00Z",
-          "estado": true
+          "estado": "usado"
         }
       },
-      "POST /publicaciones": {
+      "POST /api/producto/nuevo": {
         "auth": true,
-        "desc": "Crear nueva publicación",
+        "desc": "Crear nueva publicación (con imagen)",
+        "contentType": "multipart/form-data",
         "body": {
           "titulo": "string",
           "descripcion": "string",
           "precio": "int",
-          "url_imagen": "string",
-          "categoria_id": "int"
+          "imagen": "file (opcional)",
+          "categoria_id": "int",
+          "estado": "string ('nuevo' o 'usado')"
         },
         "response": {
           "id": 10,
           "message": "Publicación creada correctamente"
         }
       },
-      "PUT /publicaciones/:id": {
+      "PUT /api/producto/:id": {
         "auth": true,
-        "desc": "Actualizar publicación (solo dueño o admin)",
+        "desc": "Actualizar publicación (solo dueño o admin, con imagen opcional)",
+        "contentType": "multipart/form-data",
         "body": {
           "titulo": "string (opcional)",
           "descripcion": "string (opcional)",
           "precio": "int (opcional)",
-          "estado": "boolean (opcional)"
+          "imagen": "file (opcional)",
+          "estado": "string (opcional, 'nuevo' o 'usado')"
         },
         "response": {
           "message": "Publicación actualizada correctamente"
         }
       },
-      "DELETE /publicaciones/:id": {
+      "DELETE /api/producto/:id": {
         "auth": true,
         "desc": "Eliminar publicación (solo dueño o admin)",
         "response": {
           "message": "Publicación eliminada correctamente"
+        }
+      },
+      "POST /api/producto/checkout": {
+        "auth": true,
+        "desc": "Procesar compra de productos (carrito)",
+        "body": {
+          "productos": [
+            {
+              "id": 5,
+              "cantidad": 1
+            }
+          ]
+        },
+        "response": {
+          "message": "Compra procesada exitosamente"
         }
       }
     }
@@ -310,8 +398,112 @@ Backend
     "500": "Error interno del servidor"
   },
   "roles": {
-    "user": ["ver", "crear", "editar propias publicaciones"],
-    "admin": ["todo acceso"]
+    "user": [
+      "ver publicaciones",
+      "crear publicaciones",
+      "editar propias publicaciones",
+      "eliminar propias publicaciones"
+    ],
+    "admin": [
+      "todo acceso",
+      "editar cualquier publicación",
+      "eliminar cualquier publicación"
+    ]
   }
 }
+```
 
+---
+
+## 🚀 Instalación y Configuración
+
+### Backend
+
+1. Navegar a la carpeta backend:
+
+```bash
+cd backend
+```
+
+2. Instalar dependencias:
+
+```bash
+npm install
+```
+
+3. Crear archivo `.env` basado en `.env.example`:
+
+```env
+DB_USER=postgres
+DB_HOST=localhost
+DB_NAME=marketplace
+DB_PASS=tu_password
+DB_PORT=5432
+DB_DEFAULT=postgres
+PORT=3000
+JWT_SECRET=tu_secret_key
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
+```
+
+4. Crear la base de datos:
+
+```bash
+npm run createdb
+```
+
+5. Ejecutar migraciones:
+
+```bash
+npm run migrate
+```
+
+6. Iniciar servidor de desarrollo:
+
+```bash
+npm run dev
+```
+
+### Frontend
+
+1. Navegar a la carpeta frontend/marketplace:
+
+```bash
+cd frontend/marketplace
+```
+
+2. Instalar dependencias:
+
+```bash
+npm install
+```
+
+3. Iniciar servidor de desarrollo:
+
+```bash
+npm run dev
+```
+
+---
+
+## 🧪 Testing
+
+### Backend
+
+Ejecutar tests:
+
+```bash
+cd backend
+npm test
+```
+
+---
+
+## 📝 Notas Importantes
+
+- El proyecto utiliza **Cloudinary** para el almacenamiento de imágenes
+- Las imágenes se suben mediante **Multer** con soporte para Cloudinary
+- El campo `estado` en publicaciones puede ser: `'nuevo'` o `'usado'`
+- La autenticación se maneja mediante **JWT**
+- Las rutas protegidas requieren el header: `Authorization: Bearer <token>`
